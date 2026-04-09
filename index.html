@@ -48,6 +48,21 @@
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 body{padding-top:var(--safe-top);padding-bottom:var(--safe-bottom)}
 .app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+
+/* Sign-in screen */
+.signin-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;gap:24px}
+.signin-icon{font-size:48px;margin-bottom:8px}
+.signin-title{font-size:24px;font-weight:600;color:var(--text);text-align:center}
+.signin-sub{font-size:14px;color:var(--text-muted);text-align:center;line-height:1.5}
+.signin-input{width:100%;border:0.5px solid var(--border-mid);border-radius:var(--radius-lg);padding:14px 16px;font-size:16px;font-family:inherit;color:var(--text);background:var(--bg-card);outline:none;text-align:center;letter-spacing:0.05em}
+.signin-input:focus{border-color:var(--accent)}
+.signin-btn{width:100%;padding:14px;border-radius:var(--radius-lg);border:none;background:var(--accent);color:white;font-size:16px;font-weight:600;font-family:inherit;cursor:pointer;transition:all 0.15s}
+.signin-btn:active{transform:scale(0.98);opacity:0.9}
+.signin-btn:disabled{opacity:0.5;cursor:default}
+.signin-error{font-size:13px;color:#D85A30;text-align:center}
+
+/* Main app */
+.main-app{display:none;flex-direction:column;flex:1}
 .header{padding:16px 20px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid var(--border)}
 .header-day{font-size:22px;font-weight:600;color:var(--text)}
 .header-sub{font-size:13px;color:var(--text-muted);margin-top:1px}
@@ -153,140 +168,175 @@ body{padding-top:var(--safe-top);padding-bottom:var(--safe-bottom)}
 .color-swatches{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
 .swatch{width:44px;height:44px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all 0.15s}
 .swatch.selected{border-color:var(--text)}
+.signout-btn{margin-top:32px;width:100%;padding:12px;border-radius:var(--radius-lg);border:0.5px solid var(--border-mid);background:transparent;color:var(--text-muted);font-size:14px;font-family:inherit;cursor:pointer}
+.signout-btn:hover{background:var(--bg-surface)}
+.sync-status{font-size:12px;color:var(--text-hint);text-align:center;padding:6px 0}
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="header">
-    <div>
-      <div class="header-day" id="header-day"></div>
-      <div class="header-sub" id="header-sub"></div>
-    </div>
-    <div class="header-nav">
-      <button class="nav-tab active" id="tab-today" onclick="showView('today')">Today</button>
-      <button class="nav-tab" id="tab-history" onclick="showView('history')">History</button>
-      <button class="nav-tab" id="tab-stats" onclick="showView('stats')">Stats</button>
-      <button class="nav-tab" id="tab-settings" onclick="showView('settings')">&#9881;</button>
-    </div>
+
+  <!-- Sign-in screen -->
+  <div class="signin-screen" id="signin-screen">
+    <div class="signin-icon">📓</div>
+    <div class="signin-title">Daily Journal</div>
+    <div class="signin-sub">Enter your access code to continue</div>
+    <input class="signin-input" id="code-input" type="text" placeholder="e.g. negroni-4821" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+    <button class="signin-btn" id="signin-btn" onclick="submitCode()">Enter</button>
+    <div class="signin-error" id="signin-error"></div>
   </div>
 
-  <div class="progress-wrap" id="progress-wrap">
-    <div class="progress-row">
-      <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
-      <div class="progress-label" id="progress-label">0/9</div>
+  <!-- Main app -->
+  <div class="main-app" id="main-app">
+    <div class="header">
+      <div>
+        <div class="header-day" id="header-day"></div>
+        <div class="header-sub" id="header-sub"></div>
+      </div>
+      <div class="header-nav">
+        <button class="nav-tab active" id="tab-today" onclick="showView('today')">Today</button>
+        <button class="nav-tab" id="tab-history" onclick="showView('history')">History</button>
+        <button class="nav-tab" id="tab-stats" onclick="showView('stats')">Stats</button>
+        <button class="nav-tab" id="tab-settings" onclick="showView('settings')">&#9881;</button>
+      </div>
     </div>
-  </div>
 
-  <div id="today-view" style="display:flex;flex-direction:column;flex:1">
-    <div class="content">
-      <div class="section-label">How are you feeling?</div>
-      <div class="mood-row">
-        <button class="mood-btn" data-mood="1" onclick="selectMood(1)"><span style="font-size:22px">😔</span><span class="mlabel">rough</span></button>
-        <button class="mood-btn" data-mood="2" onclick="selectMood(2)"><span style="font-size:22px">😕</span><span class="mlabel">meh</span></button>
-        <button class="mood-btn" data-mood="3" onclick="selectMood(3)"><span style="font-size:22px">🙂</span><span class="mlabel">ok</span></button>
-        <button class="mood-btn" data-mood="4" onclick="selectMood(4)"><span style="font-size:22px">😊</span><span class="mlabel">good</span></button>
-        <button class="mood-btn" data-mood="5" onclick="selectMood(5)"><span style="font-size:22px">😄</span><span class="mlabel">great</span></button>
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-row">
+        <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+        <div class="progress-label" id="progress-label">0/9</div>
       </div>
+    </div>
 
-      <div class="section-label">Daily checklist</div>
-      <div class="checklist">
-        <div class="check-item" data-key="sunshine"><div class="check-circle"><div class="checkmark"></div></div><span class="check-label">Sunshine</span></div>
-        <div class="check-item" data-key="fitness"><div class="check-circle"><div class="checkmark"></div></div><span class="check-label">Some fitness</span></div>
-        <div class="check-item" data-key="vinyl"><div class="check-circle"><div class="checkmark"></div></div><span class="check-label">Vinyl / iPod</span></div>
-        <div class="check-item" data-key="rest"><div class="check-circle"><div class="checkmark"></div></div><span class="check-label">Rest</span></div>
-        <div class="check-item" data-key="recovery"><div class="check-circle"><div class="checkmark"></div></div><span class="check-label">Recovery</span></div>
-        <div class="check-item" data-key="read4growth"><div class="check-circle"><div class="checkmark"></div></div><span class="check-label">Read 4 growth</span></div>
-        <div class="check-item" data-key="house"><div class="check-circle"><div class="checkmark"></div></div><span class="check-label">Touch house</span></div>
-        <div class="check-item" data-key="music"><div class="check-circle"><div class="checkmark"></div></div><span class="check-label">Some music</span></div>
-        <div class="check-item" data-key="news"><div class="check-circle"><div class="checkmark"></div></div><span class="check-label">Some news</span></div>
-      </div>
-
-      <div class="section-label">Focus areas</div>
-      <div class="cat-grid">
-        <div class="cat-card" id="cat-vinyl">
-          <div class="cat-header" onclick="toggleCat('cat-vinyl')"><span class="cat-title">Vinyl / iPod</span><span class="cat-arrow">▾</span></div>
-          <div class="cat-body">
-            <div id="vinyl-log"></div>
-            <div class="row-input"><input id="vinyl-input" type="text" placeholder="What did you listen to?" /><button class="add-btn" onclick="addVinyl()">+</button></div>
-          </div>
+    <div id="today-view" style="display:flex;flex-direction:column;flex:1">
+      <div class="content">
+        <div class="section-label">How are you feeling?</div>
+        <div class="mood-row">
+          <button class="mood-btn" data-mood="1" onclick="selectMood(1)"><span style="font-size:22px">😔</span><span class="mlabel">rough</span></button>
+          <button class="mood-btn" data-mood="2" onclick="selectMood(2)"><span style="font-size:22px">😕</span><span class="mlabel">meh</span></button>
+          <button class="mood-btn" data-mood="3" onclick="selectMood(3)"><span style="font-size:22px">🙂</span><span class="mlabel">ok</span></button>
+          <button class="mood-btn" data-mood="4" onclick="selectMood(4)"><span style="font-size:22px">😊</span><span class="mlabel">good</span></button>
+          <button class="mood-btn" data-mood="5" onclick="selectMood(5)"><span style="font-size:22px">😄</span><span class="mlabel">great</span></button>
         </div>
-        <div class="cat-card" id="cat-fitness">
-          <div class="cat-header" onclick="toggleCat('cat-fitness')"><span class="cat-title">Fitness</span><span class="cat-arrow">▾</span></div>
-          <div class="cat-body">
-            <div class="tag-wrap" id="fitness-tags">
-              <div class="ftag" onclick="toggleFtag(this)">Stretch</div>
-              <div class="ftag" onclick="toggleFtag(this)">VR Boxing</div>
-              <div class="ftag" onclick="toggleFtag(this)">Spin Bike</div>
-              <div class="ftag" onclick="toggleFtag(this)">Walk</div>
-              <div class="ftag" onclick="toggleFtag(this)">Yoga</div>
+        <div class="section-label">Daily checklist</div>
+        <div class="checklist">
+          <div class="check-item" data-key="sunshine"><div class="check-circle"><div class="checkmark"></div></div><span class="check-label">Sunshine</span></div>
+          <div class="check-item" data-key="fitness"><div class="check-circle"><div class="checkmark"></div></div><span class="check-label">Some fitness</span></div>
+          <div class="check-item" data-key="vinyl"><div class="check-circle"><div class="checkmark"></div></div><span class="check-label">Vinyl / iPod</span></div>
+          <div class="check-item" data-key="rest"><div class="check-circle"><div class="checkmark"></div></div><span class="check-label">Rest</span></div>
+          <div class="check-item" data-key="recovery"><div class="check-circle"><div class="checkmark"></div></div><span class="check-label">Recovery</span></div>
+          <div class="check-item" data-key="read4growth"><div class="check-circle"><div class="checkmark"></div></div><span class="check-label">Read 4 growth</span></div>
+          <div class="check-item" data-key="house"><div class="check-circle"><div class="checkmark"></div></div><span class="check-label">Touch house</span></div>
+          <div class="check-item" data-key="music"><div class="check-circle"><div class="checkmark"></div></div><span class="check-label">Some music</span></div>
+          <div class="check-item" data-key="news"><div class="check-circle"><div class="checkmark"></div></div><span class="check-label">Some news</span></div>
+        </div>
+        <div class="section-label">Focus areas</div>
+        <div class="cat-grid">
+          <div class="cat-card" id="cat-vinyl">
+            <div class="cat-header" onclick="toggleCat('cat-vinyl')"><span class="cat-title">Vinyl / iPod</span><span class="cat-arrow">▾</span></div>
+            <div class="cat-body">
+              <div id="vinyl-log"></div>
+              <div class="row-input"><input id="vinyl-input" type="text" placeholder="What did you listen to?" /><button class="add-btn" onclick="addVinyl()">+</button></div>
             </div>
-            <div class="row-input"><input id="fitness-input" type="text" placeholder="Other exercise..." /><button class="add-btn" onclick="addFitness()">+</button></div>
+          </div>
+          <div class="cat-card" id="cat-fitness">
+            <div class="cat-header" onclick="toggleCat('cat-fitness')"><span class="cat-title">Fitness</span><span class="cat-arrow">▾</span></div>
+            <div class="cat-body">
+              <div class="tag-wrap" id="fitness-tags">
+                <div class="ftag" onclick="toggleFtag(this)">Stretch</div>
+                <div class="ftag" onclick="toggleFtag(this)">VR Boxing</div>
+                <div class="ftag" onclick="toggleFtag(this)">Spin Bike</div>
+                <div class="ftag" onclick="toggleFtag(this)">Walk</div>
+                <div class="ftag" onclick="toggleFtag(this)">Yoga</div>
+              </div>
+              <div class="row-input"><input id="fitness-input" type="text" placeholder="Other exercise..." /><button class="add-btn" onclick="addFitness()">+</button></div>
+            </div>
+          </div>
+          <div class="cat-card" id="cat-hygge">
+            <div class="cat-header" onclick="toggleCat('cat-hygge')"><span class="cat-title">Hygge</span><span class="cat-arrow">▾</span></div>
+            <div class="cat-body">
+              <div class="sub-check" data-hygge="read" onclick="toggleSub(this)"><div class="sub-box"><div class="sub-mark"></div></div><span class="sub-label">Read</span></div>
+              <div class="sub-check" data-hygge="write" onclick="toggleSub(this)"><div class="sub-box"><div class="sub-mark"></div></div><span class="sub-label">Write</span></div>
+              <div class="sub-check" data-hygge="type" onclick="toggleSub(this)"><div class="sub-box"><div class="sub-mark"></div></div><span class="sub-label">Type</span></div>
+              <div class="sub-check" data-hygge="knit" onclick="toggleSub(this)"><div class="sub-box"><div class="sub-mark"></div></div><span class="sub-label">Knit</span></div>
+              <div class="sub-check" data-hygge="game" onclick="toggleSub(this)"><div class="sub-box"><div class="sub-mark"></div></div><span class="sub-label">Game</span></div>
+            </div>
+          </div>
+          <div class="cat-card" id="cat-house">
+            <div class="cat-header" onclick="toggleCat('cat-house')"><span class="cat-title">House</span><span class="cat-arrow">▾</span></div>
+            <div class="cat-body">
+              <div id="house-items"></div>
+              <div class="row-input"><input id="house-input" type="text" placeholder="Add a chore..." /><button class="add-btn" onclick="addHouse()">+</button></div>
+            </div>
           </div>
         </div>
-        <div class="cat-card" id="cat-hygge">
-          <div class="cat-header" onclick="toggleCat('cat-hygge')"><span class="cat-title">Hygge</span><span class="cat-arrow">▾</span></div>
-          <div class="cat-body">
-            <div class="sub-check" data-hygge="read" onclick="toggleSub(this)"><div class="sub-box"><div class="sub-mark"></div></div><span class="sub-label">Read</span></div>
-            <div class="sub-check" data-hygge="write" onclick="toggleSub(this)"><div class="sub-box"><div class="sub-mark"></div></div><span class="sub-label">Write</span></div>
-            <div class="sub-check" data-hygge="type" onclick="toggleSub(this)"><div class="sub-box"><div class="sub-mark"></div></div><span class="sub-label">Type</span></div>
-            <div class="sub-check" data-hygge="knit" onclick="toggleSub(this)"><div class="sub-box"><div class="sub-mark"></div></div><span class="sub-label">Knit</span></div>
-            <div class="sub-check" data-hygge="game" onclick="toggleSub(this)"><div class="sub-box"><div class="sub-mark"></div></div><span class="sub-label">Game</span></div>
-          </div>
+        <div class="section-label">Notes</div>
+        <textarea class="freewrite" id="freewrite" placeholder="Anything on your mind today..."></textarea>
+      </div>
+      <div class="save-wrap">
+        <div class="sync-status" id="sync-status"></div>
+        <button class="save-btn" id="save-btn" onclick="saveEntry()">Save today</button>
+      </div>
+    </div>
+
+    <div id="history-view">
+      <div class="content">
+        <div class="cal-nav">
+          <button onclick="calPrev()">&#8592;</button>
+          <span id="cal-month-label"></span>
+          <button onclick="calNext()">&#8594;</button>
         </div>
-        <div class="cat-card" id="cat-house">
-          <div class="cat-header" onclick="toggleCat('cat-house')"><span class="cat-title">House</span><span class="cat-arrow">▾</span></div>
-          <div class="cat-body">
-            <div id="house-items"></div>
-            <div class="row-input"><input id="house-input" type="text" placeholder="Add a chore..." /><button class="add-btn" onclick="addHouse()">+</button></div>
-          </div>
+        <div class="cal-grid" id="cal-grid"></div>
+        <div id="past-entry-display"></div>
+      </div>
+    </div>
+
+    <div id="stats-view">
+      <div class="content">
+        <div class="section-label" style="margin-top:0">This month</div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-num" id="stat-entries">0</div><div class="stat-label">Days logged</div></div>
+          <div class="stat-card"><div class="stat-num" id="stat-perfect">0</div><div class="stat-label">Perfect days</div></div>
+          <div class="stat-card"><div class="stat-num" id="stat-streak">0</div><div class="stat-label">Current streak</div></div>
+          <div class="stat-card"><div class="stat-num" id="stat-avg">0</div><div class="stat-label">Avg checks / day</div></div>
         </div>
+        <div class="section-label">Checklist this month</div>
+        <div id="check-bars"></div>
+        <div class="section-label">Mood this month</div>
+        <div class="mood-stats" id="mood-stats"></div>
       </div>
-
-      <div class="section-label">Notes</div>
-      <textarea class="freewrite" id="freewrite" placeholder="Anything on your mind today..."></textarea>
     </div>
-    <div class="save-wrap">
-      <button class="save-btn" id="save-btn" onclick="saveEntry()">Save today</button>
-    </div>
-  </div>
 
-  <div id="history-view">
-    <div class="content">
-      <div class="cal-nav">
-        <button onclick="calPrev()">&#8592;</button>
-        <span id="cal-month-label"></span>
-        <button onclick="calNext()">&#8594;</button>
+    <div id="settings-view">
+      <div class="content">
+        <div class="section-label" style="margin-top:0">Accent color</div>
+        <div class="color-swatches" id="color-swatches"></div>
+        <button class="signout-btn" onclick="signOut()">Sign out of this device</button>
       </div>
-      <div class="cal-grid" id="cal-grid"></div>
-      <div id="past-entry-display"></div>
-    </div>
-  </div>
-
-  <div id="stats-view">
-    <div class="content">
-      <div class="section-label" style="margin-top:0">This month</div>
-      <div class="stats-grid">
-        <div class="stat-card"><div class="stat-num" id="stat-entries">0</div><div class="stat-label">Days logged</div></div>
-        <div class="stat-card"><div class="stat-num" id="stat-perfect">0</div><div class="stat-label">Perfect days</div></div>
-        <div class="stat-card"><div class="stat-num" id="stat-streak">0</div><div class="stat-label">Current streak</div></div>
-        <div class="stat-card"><div class="stat-num" id="stat-avg">0</div><div class="stat-label">Avg checks / day</div></div>
-      </div>
-      <div class="section-label">Checklist this month</div>
-      <div id="check-bars"></div>
-      <div class="section-label">Mood this month</div>
-      <div class="mood-stats" id="mood-stats"></div>
-    </div>
-  </div>
-
-  <div id="settings-view">
-    <div class="content">
-      <div class="section-label" style="margin-top:0">Accent color</div>
-      <div class="color-swatches" id="color-swatches"></div>
     </div>
   </div>
 </div>
 
 <script>
+const SUPABASE_URL = 'https://wxsefbilwilpzpjoynds.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4c2VmYmlsd2lscHpwam95bmRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NTY1NzUsImV4cCI6MjA5MTIzMjU3NX0.X6wYcI6IjlJNCJUEMGpOoxy1UX796PBro7_Kj7DtDVA';
+
+async function sbFetch(path, opts={}) {
+  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': opts.prefer || 'return=representation',
+      ...opts.headers
+    },
+    ...opts
+  });
+  if (!res.ok) { const e = await res.text(); throw new Error(e); }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
 const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const CL_KEYS=['sunshine','fitness','vinyl','rest','recovery','read4growth','house','music','news'];
@@ -301,203 +351,304 @@ const COLORS=[
   {name:'Pink',accent:'#D4537E',light:'#FBEAF0',mid:'#ED93B1',dark:'#72243E'},
   {name:'Amber',accent:'#BA7517',light:'#FAEEDA',mid:'#FAC775',dark:'#633806'},
 ];
-const now=new Date();
-const todayKey=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
-document.getElementById('header-day').textContent=DAYS[now.getDay()];
-document.getElementById('header-sub').textContent=MONTHS[now.getMonth()]+' '+now.getDate()+', '+now.getFullYear();
-let state={checks:{},vinyl:[],fitness:[],hygge:[],house:[],mood:0,note:''};
-let calYear=now.getFullYear(),calMonth=now.getMonth(),selectedDay=null;
+
+const now = new Date();
+const todayKey = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+let userCode = null;
+let state = {checks:{},vinyl:[],fitness:[],hygge:[],house:[],mood:0,note:''};
+let calYear = now.getFullYear(), calMonth = now.getMonth(), selectedDay = null;
+let allEntries = [];
+
 function sl(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 function gl(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null;}catch(e){return null;}}
-function allKeys(){try{return Object.keys(localStorage).filter(k=>k.startsWith('journal:'));}catch(e){return[];}}
-function applyAccent(c){
-  const r=document.documentElement.style;
-  r.setProperty('--accent',c.accent);r.setProperty('--accent-light',c.light);
-  r.setProperty('--accent-mid',c.mid);r.setProperty('--accent-dark',c.dark);
-  document.querySelectorAll('.swatch').forEach(s=>s.classList.toggle('selected',s.dataset.name===c.name));
+
+async function submitCode() {
+  const input = document.getElementById('code-input');
+  const code = input.value.trim().toLowerCase();
+  if (!code) return;
+  const btn = document.getElementById('signin-btn');
+  btn.disabled = true; btn.textContent = 'Checking...';
+  document.getElementById('signin-error').textContent = '';
+  try {
+    const rows = await sbFetch('journal_codes?code=eq.'+encodeURIComponent(code)+'&select=code');
+    if (rows && rows.length > 0) {
+      sl('journal_code', code);
+      initApp(code);
+    } else {
+      document.getElementById('signin-error').textContent = 'Code not recognised. Please try again.';
+      btn.disabled = false; btn.textContent = 'Enter';
+    }
+  } catch(e) {
+    document.getElementById('signin-error').textContent = 'Connection error. Please try again.';
+    btn.disabled = false; btn.textContent = 'Enter';
+  }
 }
-function buildSwatches(){
-  const saved=gl('accent-color')||'Teal';
-  const wrap=document.getElementById('color-swatches');
-  COLORS.forEach(c=>{
-    const s=document.createElement('div');
-    s.className='swatch'+(c.name===saved?' selected':'');
-    s.dataset.name=c.name;s.style.background=c.accent;s.title=c.name;
-    s.onclick=()=>{sl('accent-color',c.name);applyAccent(c);};
-    wrap.appendChild(s);
-    if(c.name===saved)applyAccent(c);
-  });
+
+document.getElementById('code-input').addEventListener('keydown', e => { if(e.key==='Enter') submitCode(); });
+
+function signOut() {
+  if (!confirm('Sign out of this device?')) return;
+  localStorage.removeItem('journal_code');
+  location.reload();
 }
-function loadToday(){
-  const saved=gl('journal:'+todayKey);
-  if(saved){state=saved;applyState();}
+
+async function initApp(code) {
+  userCode = code;
+  document.getElementById('signin-screen').style.display = 'none';
+  document.getElementById('main-app').style.display = 'flex';
+  document.getElementById('header-day').textContent = DAYS[now.getDay()];
+  document.getElementById('header-sub').textContent = MONTHS[now.getMonth()]+' '+now.getDate()+', '+now.getFullYear();
+  buildSwatches();
+  await loadAllEntries();
+  loadToday();
 }
-function applyState(){
-  document.querySelectorAll('.check-item').forEach(el=>el.classList.toggle('done',!!(state.checks&&state.checks[el.dataset.key])));
+
+async function loadAllEntries() {
+  try {
+    const rows = await sbFetch('journal_entries?code=eq.'+encodeURIComponent(userCode)+'&select=date,data&order=date.desc');
+    allEntries = rows || [];
+  } catch(e) { allEntries = []; }
+}
+
+function getEntry(dateKey) {
+  const row = allEntries.find(r => r.date === dateKey);
+  return row ? row.data : null;
+}
+
+function loadToday() {
+  const saved = getEntry(todayKey);
+  if (saved) { state = saved; applyState(); }
+}
+
+function applyState() {
+  document.querySelectorAll('.check-item').forEach(el => el.classList.toggle('done', !!(state.checks&&state.checks[el.dataset.key])));
   updateProgress();
-  selectMood(state.mood||0,true);
-  document.getElementById('freewrite').value=state.note||'';
-  document.getElementById('vinyl-log').innerHTML='';
-  (state.vinyl||[]).forEach(v=>{const d=document.createElement('div');d.className='vinyl-entry';d.textContent=v;document.getElementById('vinyl-log').appendChild(d);});
-  document.querySelectorAll('.ftag').forEach(t=>t.classList.toggle('active',(state.fitness||[]).includes(t.textContent)));
-  document.querySelectorAll('.sub-check[data-hygge]').forEach(el=>el.classList.toggle('done',(state.hygge||[]).includes(el.dataset.hygge)));
-  document.getElementById('house-items').innerHTML='';
-  (state.house||[]).forEach(item=>renderHouseItem(item));
+  selectMood(state.mood||0, true);
+  document.getElementById('freewrite').value = state.note||'';
+  document.getElementById('vinyl-log').innerHTML = '';
+  (state.vinyl||[]).forEach(v => { const d=document.createElement('div'); d.className='vinyl-entry'; d.textContent=v; document.getElementById('vinyl-log').appendChild(d); });
+  document.querySelectorAll('.ftag').forEach(t => t.classList.toggle('active', (state.fitness||[]).includes(t.textContent)));
+  document.querySelectorAll('.sub-check[data-hygge]').forEach(el => el.classList.toggle('done', (state.hygge||[]).includes(el.dataset.hygge)));
+  document.getElementById('house-items').innerHTML = '';
+  (state.house||[]).forEach(item => renderHouseItem(item));
 }
-function updateProgress(){
-  const done=CL_KEYS.filter(k=>state.checks&&state.checks[k]).length;
-  document.getElementById('progress').style.width=Math.round(done/9*100)+'%';
-  document.getElementById('progress-label').textContent=done+'/9';
+
+function updateProgress() {
+  const done = CL_KEYS.filter(k => state.checks&&state.checks[k]).length;
+  document.getElementById('progress').style.width = Math.round(done/9*100)+'%';
+  document.getElementById('progress-label').textContent = done+'/9';
 }
-document.querySelectorAll('.check-item').forEach(el=>{
-  el.addEventListener('click',()=>{
+
+document.querySelectorAll('.check-item').forEach(el => {
+  el.addEventListener('click', () => {
     el.classList.toggle('done');
-    if(!state.checks)state.checks={};
-    state.checks[el.dataset.key]=el.classList.contains('done');
+    if(!state.checks) state.checks={};
+    state.checks[el.dataset.key] = el.classList.contains('done');
     updateProgress();
   });
 });
-function selectMood(m,silent){
-  state.mood=m;
-  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.toggle('selected',parseInt(b.dataset.mood)===m));
+
+function selectMood(m, silent) {
+  state.mood = m;
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.toggle('selected', parseInt(b.dataset.mood)===m));
 }
-function toggleCat(id){document.getElementById(id).classList.toggle('open');}
-function toggleSub(el){
-  el.classList.toggle('done');const k=el.dataset.hygge;
-  if(!state.hygge)state.hygge=[];
-  if(el.classList.contains('done')){if(!state.hygge.includes(k))state.hygge.push(k);}
-  else{state.hygge=state.hygge.filter(x=>x!==k);}
+
+function toggleCat(id) { document.getElementById(id).classList.toggle('open'); }
+
+function toggleSub(el) {
+  el.classList.toggle('done'); const k = el.dataset.hygge;
+  if(!state.hygge) state.hygge=[];
+  if(el.classList.contains('done')) { if(!state.hygge.includes(k)) state.hygge.push(k); }
+  else { state.hygge = state.hygge.filter(x=>x!==k); }
 }
-function toggleFtag(el){
-  el.classList.toggle('active');if(!state.fitness)state.fitness=[];
-  const v=el.textContent;
-  if(el.classList.contains('active')){if(!state.fitness.includes(v))state.fitness.push(v);}
-  else{state.fitness=state.fitness.filter(x=>x!==v);}
+
+function toggleFtag(el) {
+  el.classList.toggle('active'); if(!state.fitness) state.fitness=[];
+  const v = el.textContent;
+  if(el.classList.contains('active')) { if(!state.fitness.includes(v)) state.fitness.push(v); }
+  else { state.fitness = state.fitness.filter(x=>x!==v); }
 }
-function addVinyl(){
-  const inp=document.getElementById('vinyl-input');const v=inp.value.trim();if(!v)return;
-  if(!state.vinyl)state.vinyl=[];state.vinyl.push(v);
-  const d=document.createElement('div');d.className='vinyl-entry';d.textContent=v;
-  document.getElementById('vinyl-log').appendChild(d);inp.value='';
+
+function addVinyl() {
+  const inp = document.getElementById('vinyl-input'); const v = inp.value.trim(); if(!v) return;
+  if(!state.vinyl) state.vinyl=[];
+  state.vinyl.push(v);
+  const d = document.createElement('div'); d.className='vinyl-entry'; d.textContent=v;
+  document.getElementById('vinyl-log').appendChild(d); inp.value='';
 }
-function addFitness(){
-  const inp=document.getElementById('fitness-input');const v=inp.value.trim();if(!v)return;
-  if(!state.fitness)state.fitness=[];if(!state.fitness.includes(v))state.fitness.push(v);
-  const tag=document.createElement('div');tag.className='ftag active';tag.textContent=v;
-  tag.onclick=()=>toggleFtag(tag);document.getElementById('fitness-tags').appendChild(tag);inp.value='';
+
+function addFitness() {
+  const inp = document.getElementById('fitness-input'); const v = inp.value.trim(); if(!v) return;
+  if(!state.fitness) state.fitness=[];
+  if(!state.fitness.includes(v)) state.fitness.push(v);
+  const tag = document.createElement('div'); tag.className='ftag active'; tag.textContent=v;
+  tag.onclick = () => toggleFtag(tag);
+  document.getElementById('fitness-tags').appendChild(tag); inp.value='';
 }
-function renderHouseItem(item){
-  const el=document.createElement('div');el.className='house-item'+(item.done?' done':'');
-  el.innerHTML='<div class="sub-box"><div class="sub-mark"></div></div><span class="sub-label">'+item.label+'</span>';
-  el.onclick=()=>{el.classList.toggle('done');item.done=el.classList.contains('done');};
+
+function renderHouseItem(item) {
+  const el = document.createElement('div'); el.className='house-item'+(item.done?' done':'');
+  el.innerHTML = '<div class="sub-box"><div class="sub-mark"></div></div><span class="sub-label">'+item.label+'</span>';
+  el.onclick = () => { el.classList.toggle('done'); item.done=el.classList.contains('done'); };
   document.getElementById('house-items').appendChild(el);
 }
-function addHouse(){
-  const inp=document.getElementById('house-input');const v=inp.value.trim();if(!v)return;
-  if(!state.house)state.house=[];const item={label:v,done:false};
-  state.house.push(item);renderHouseItem(item);inp.value='';
+
+function addHouse() {
+  const inp = document.getElementById('house-input'); const v = inp.value.trim(); if(!v) return;
+  if(!state.house) state.house=[];
+  const item = {label:v, done:false};
+  state.house.push(item); renderHouseItem(item); inp.value='';
 }
-document.querySelectorAll('input').forEach(inp=>{
-  inp.addEventListener('keydown',e=>{
-    if(e.key==='Enter'){
-      if(inp.id==='vinyl-input')addVinyl();
-      if(inp.id==='fitness-input')addFitness();
-      if(inp.id==='house-input')addHouse();
+
+document.querySelectorAll('input').forEach(inp => {
+  inp.addEventListener('keydown', e => {
+    if(e.key==='Enter') {
+      if(inp.id==='vinyl-input') addVinyl();
+      if(inp.id==='fitness-input') addFitness();
+      if(inp.id==='house-input') addHouse();
     }
   });
 });
-document.getElementById('freewrite').addEventListener('input',e=>{state.note=e.target.value;});
-function saveEntry(){
-  sl('journal:'+todayKey,state);
-  const btn=document.getElementById('save-btn');
-  btn.textContent='Saved ✓';btn.classList.add('saved');
-  setTimeout(()=>{btn.textContent='Save today';btn.classList.remove('saved');},2000);
+
+document.getElementById('freewrite').addEventListener('input', e => { state.note = e.target.value; });
+
+async function saveEntry() {
+  const btn = document.getElementById('save-btn');
+  const status = document.getElementById('sync-status');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  try {
+    const existing = allEntries.find(r => r.date === todayKey);
+    if (existing) {
+      await sbFetch('journal_entries?code=eq.'+encodeURIComponent(userCode)+'&date=eq.'+todayKey, {
+        method: 'PATCH',
+        prefer: 'return=minimal',
+        body: JSON.stringify({data: state})
+      });
+      existing.data = state;
+    } else {
+      await sbFetch('journal_entries', {
+        method: 'POST',
+        body: JSON.stringify({code: userCode, date: todayKey, data: state})
+      });
+      allEntries.unshift({code: userCode, date: todayKey, data: state});
+    }
+    btn.textContent = 'Saved ✓'; status.textContent = 'Synced to cloud';
+    setTimeout(() => { btn.textContent='Save today'; btn.disabled=false; status.textContent=''; }, 2000);
+  } catch(e) {
+    btn.textContent = 'Save today'; btn.disabled = false;
+    status.textContent = 'Could not sync — check your connection';
+  }
 }
-function showView(v){
-  ['today','history','stats','settings'].forEach(n=>{
-    const el=document.getElementById(n+'-view');
-    el.style.display='none';
-    const tab=document.getElementById('tab-'+n);
-    if(tab)tab.classList.remove('active');
+
+function showView(v) {
+  ['today','history','stats','settings'].forEach(n => {
+    const el = document.getElementById(n+'-view'); el.style.display='none';
+    const tab = document.getElementById('tab-'+n); if(tab) tab.classList.remove('active');
   });
-  const el=document.getElementById(v+'-view');
-  el.style.display=v==='today'?'flex':'block';
-  if(v==='today'){el.style.flexDirection='column';el.style.flex='1';}
-  const tab=document.getElementById('tab-'+v);if(tab)tab.classList.add('active');
-  document.getElementById('progress-wrap').style.display=v==='today'?'block':'none';
-  if(v==='history')renderCal();
-  if(v==='stats')renderStats();
+  const el = document.getElementById(v+'-view');
+  el.style.display = v==='today' ? 'flex' : 'block';
+  if(v==='today') { el.style.flexDirection='column'; el.style.flex='1'; }
+  const tab = document.getElementById('tab-'+v); if(tab) tab.classList.add('active');
+  document.getElementById('progress-wrap').style.display = v==='today' ? 'block' : 'none';
+  if(v==='history') renderCal();
+  if(v==='stats') renderStats();
 }
-function renderCal(){
-  const entryDates=new Set(allKeys().map(k=>k.replace('journal:','')));
-  document.getElementById('cal-month-label').textContent=MONTHS[calMonth]+' '+calYear;
-  const grid=document.getElementById('cal-grid');grid.innerHTML='';
-  ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d=>{const el=document.createElement('div');el.className='cal-dow';el.textContent=d;grid.appendChild(el);});
-  const first=new Date(calYear,calMonth,1).getDay();
-  const total=new Date(calYear,calMonth+1,0).getDate();
-  for(let i=0;i<first;i++){const el=document.createElement('div');el.className='cal-day empty';grid.appendChild(el);}
-  for(let d=1;d<=total;d++){
-    const dk=calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-    const el=document.createElement('div');el.className='cal-day';
-    const num=document.createElement('span');num.className='cal-num';num.textContent=d;el.appendChild(num);
-    if(dk===todayKey)el.classList.add('today');
-    if(entryDates.has(dk)){el.classList.add('has-entry');const dot=document.createElement('div');dot.className='cal-dot';el.appendChild(dot);}
-    if(dk===selectedDay)el.classList.add('selected');
-    el.onclick=()=>{selectedDay=dk;renderCal();showPastEntry(dk,entryDates);};
+
+function renderCal() {
+  const entryDates = new Set(allEntries.map(r => r.date));
+  document.getElementById('cal-month-label').textContent = MONTHS[calMonth]+' '+calYear;
+  const grid = document.getElementById('cal-grid'); grid.innerHTML='';
+  ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d => { const el=document.createElement('div'); el.className='cal-dow'; el.textContent=d; grid.appendChild(el); });
+  const first = new Date(calYear,calMonth,1).getDay();
+  const total = new Date(calYear,calMonth+1,0).getDate();
+  for(let i=0;i<first;i++) { const el=document.createElement('div'); el.className='cal-day empty'; grid.appendChild(el); }
+  for(let d=1;d<=total;d++) {
+    const dk = calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const el = document.createElement('div'); el.className='cal-day';
+    const num = document.createElement('span'); num.className='cal-num'; num.textContent=d; el.appendChild(num);
+    if(dk===todayKey) el.classList.add('today');
+    if(entryDates.has(dk)) { el.classList.add('has-entry'); const dot=document.createElement('div'); dot.className='cal-dot'; el.appendChild(dot); }
+    if(dk===selectedDay) el.classList.add('selected');
+    el.onclick = () => { selectedDay=dk; renderCal(); showPastEntry(dk); };
     grid.appendChild(el);
   }
 }
-function showPastEntry(dk,entryDates){
-  const disp=document.getElementById('past-entry-display');
-  if(!entryDates.has(dk)){disp.innerHTML='<div class="no-entry">No entry for this day</div>';return;}
-  const e=gl('journal:'+dk);
-  if(!e){disp.innerHTML='<div class="no-entry">Could not load entry</div>';return;}
-  const parts=dk.split('-');
-  const d=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
-  let html='<div class="past-card"><div class="past-date-label">';
-  if(e.mood)html+='<span style="font-size:18px;margin-right:6px">'+MOOD_EMOJI[e.mood]+'</span>';
-  html+=DAYS[d.getDay()]+', '+MONTHS[d.getMonth()]+' '+d.getDate()+'</div>';
-  html+='<div class="past-chips">';
-  CL_KEYS.forEach(k=>{html+='<span class="chip '+(e.checks&&e.checks[k]?'done':'miss')+'">'+CL_LABELS[k]+'</span>';});
-  html+='</div>';
-  if(e.vinyl&&e.vinyl.length)html+='<div class="past-section"><div class="past-section-title">Vinyl / iPod</div><div class="past-items">'+e.vinyl.map(v=>'<span class="past-item">'+v+'</span>').join('')+'</div></div>';
-  if(e.fitness&&e.fitness.length)html+='<div class="past-section"><div class="past-section-title">Fitness</div><div class="past-items">'+e.fitness.map(v=>'<span class="past-item">'+v+'</span>').join('')+'</div></div>';
-  if(e.hygge&&e.hygge.length)html+='<div class="past-section"><div class="past-section-title">Hygge</div><div class="past-items">'+e.hygge.map(v=>'<span class="past-item">'+v+'</span>').join('')+'</div></div>';
-  if(e.house&&e.house.length)html+='<div class="past-section"><div class="past-section-title">House</div><div class="past-items">'+e.house.map(v=>'<span class="past-item'+(v.done?' done':'')+'">'+v.label+'</span>').join('')+'</div></div>';
-  if(e.note)html+='<div class="past-section"><div class="past-section-title">Notes</div><div class="past-note">'+e.note+'</div></div>';
-  html+='</div>';
-  disp.innerHTML=html;
+
+function showPastEntry(dk) {
+  const disp = document.getElementById('past-entry-display');
+  const e = getEntry(dk);
+  if(!e) { disp.innerHTML='<div class="no-entry">No entry for this day</div>'; return; }
+  const parts = dk.split('-');
+  const d = new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
+  let html = '<div class="past-card"><div class="past-date-label">';
+  if(e.mood) html += '<span style="font-size:18px;margin-right:6px">'+MOOD_EMOJI[e.mood]+'</span>';
+  html += DAYS[d.getDay()]+', '+MONTHS[d.getMonth()]+' '+d.getDate()+'</div>';
+  html += '<div class="past-chips">';
+  CL_KEYS.forEach(k => { html += '<span class="chip '+(e.checks&&e.checks[k]?'done':'miss')+'">'+CL_LABELS[k]+'</span>'; });
+  html += '</div>';
+  if(e.vinyl&&e.vinyl.length) html += '<div class="past-section"><div class="past-section-title">Vinyl / iPod</div><div class="past-items">'+e.vinyl.map(v=>'<span class="past-item">'+v+'</span>').join('')+'</div></div>';
+  if(e.fitness&&e.fitness.length) html += '<div class="past-section"><div class="past-section-title">Fitness</div><div class="past-items">'+e.fitness.map(v=>'<span class="past-item">'+v+'</span>').join('')+'</div></div>';
+  if(e.hygge&&e.hygge.length) html += '<div class="past-section"><div class="past-section-title">Hygge</div><div class="past-items">'+e.hygge.map(v=>'<span class="past-item">'+v+'</span>').join('')+'</div></div>';
+  if(e.house&&e.house.length) html += '<div class="past-section"><div class="past-section-title">House</div><div class="past-items">'+e.house.map(v=>'<span class="past-item'+(v.done?' done':'')+'">'+v.label+'</span>').join('')+'</div></div>';
+  if(e.note) html += '<div class="past-section"><div class="past-section-title">Notes</div><div class="past-note">'+e.note+'</div></div>';
+  html += '</div>';
+  disp.innerHTML = html;
 }
-function calPrev(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCal();}
-function calNext(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCal();}
-function renderStats(){
-  const y=now.getFullYear(),m=now.getMonth();
-  const prefix='journal:'+y+'-'+String(m+1).padStart(2,'0')+'-';
-  const entries=allKeys().filter(k=>k.startsWith(prefix)).map(k=>gl(k)).filter(Boolean);
-  document.getElementById('stat-entries').textContent=entries.length;
-  document.getElementById('stat-perfect').textContent=entries.filter(e=>CL_KEYS.every(k=>e.checks&&e.checks[k])).length;
-  document.getElementById('stat-avg').textContent=entries.length?Math.round(entries.reduce((s,e)=>s+CL_KEYS.filter(k=>e.checks&&e.checks[k]).length,0)/entries.length):0;
-  let streak=0,d=new Date();
-  while(true){
-    const dk=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    if(gl('journal:'+dk)){streak++;d.setDate(d.getDate()-1);}else break;
+
+function calPrev() { calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCal(); }
+function calNext() { calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCal(); }
+
+function renderStats() {
+  const y = now.getFullYear(), m = now.getMonth();
+  const prefix = y+'-'+String(m+1).padStart(2,'0')+'-';
+  const entries = allEntries.filter(r => r.date.startsWith(prefix)).map(r => r.data).filter(Boolean);
+  document.getElementById('stat-entries').textContent = entries.length;
+  document.getElementById('stat-perfect').textContent = entries.filter(e => CL_KEYS.every(k=>e.checks&&e.checks[k])).length;
+  document.getElementById('stat-avg').textContent = entries.length ? Math.round(entries.reduce((s,e)=>s+CL_KEYS.filter(k=>e.checks&&e.checks[k]).length,0)/entries.length) : 0;
+  let streak=0, d=new Date();
+  while(true) {
+    const dk = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    if(getEntry(dk)) { streak++; d.setDate(d.getDate()-1); } else break;
   }
-  document.getElementById('stat-streak').textContent=streak;
-  const bars=document.getElementById('check-bars');bars.innerHTML='';
-  CL_KEYS.forEach(k=>{
-    const pct=entries.length?Math.round(entries.filter(e=>e.checks&&e.checks[k]).length/entries.length*100):0;
-    bars.innerHTML+='<div class="bar-row"><span class="bar-label">'+CL_LABELS[k]+'</span><div class="bar-track"><div class="bar-fill" style="width:'+pct+'%"></div></div><span class="bar-pct">'+pct+'%</span></div>';
+  document.getElementById('stat-streak').textContent = streak;
+  const bars = document.getElementById('check-bars'); bars.innerHTML='';
+  CL_KEYS.forEach(k => {
+    const pct = entries.length ? Math.round(entries.filter(e=>e.checks&&e.checks[k]).length/entries.length*100) : 0;
+    bars.innerHTML += '<div class="bar-row"><span class="bar-label">'+CL_LABELS[k]+'</span><div class="bar-track"><div class="bar-fill" style="width:'+pct+'%"></div></div><span class="bar-pct">'+pct+'%</span></div>';
   });
-  const moodWrap=document.getElementById('mood-stats');moodWrap.innerHTML='';
+  const moodWrap = document.getElementById('mood-stats'); moodWrap.innerHTML='';
   const mc=[0,0,0,0,0,0];
-  entries.forEach(e=>{if(e.mood&&e.mood>=1&&e.mood<=5)mc[e.mood]++;});
+  entries.forEach(e => { if(e.mood&&e.mood>=1&&e.mood<=5) mc[e.mood]++; });
   let any=false;
-  for(let i=1;i<=5;i++){if(mc[i]>0){moodWrap.innerHTML+='<div class="mood-stat"><span style="font-size:20px">'+MOOD_EMOJI[i]+'</span><span>'+mc[i]+'x '+MOOD_LABELS[i]+'</span></div>';any=true;}}
-  if(!any)moodWrap.innerHTML='<span style="color:var(--text-hint);font-size:14px">No mood data yet</span>';
+  for(let i=1;i<=5;i++) { if(mc[i]>0) { moodWrap.innerHTML+='<div class="mood-stat"><span style="font-size:20px">'+MOOD_EMOJI[i]+'</span><span>'+mc[i]+'x '+MOOD_LABELS[i]+'</span></div>'; any=true; } }
+  if(!any) moodWrap.innerHTML='<span style="color:var(--text-hint);font-size:14px">No mood data yet</span>';
 }
-if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js');});}
-buildSwatches();
-loadToday();
+
+function applyAccent(c) {
+  const r = document.documentElement.style;
+  r.setProperty('--accent',c.accent); r.setProperty('--accent-light',c.light);
+  r.setProperty('--accent-mid',c.mid); r.setProperty('--accent-dark',c.dark);
+  document.querySelectorAll('.swatch').forEach(s => s.classList.toggle('selected', s.dataset.name===c.name));
+}
+
+function buildSwatches() {
+  const saved = gl('accent-color')||'Teal';
+  const wrap = document.getElementById('color-swatches');
+  COLORS.forEach(c => {
+    const s = document.createElement('div');
+    s.className = 'swatch'+(c.name===saved?' selected':'');
+    s.dataset.name = c.name; s.style.background = c.accent; s.title = c.name;
+    s.onclick = () => { sl('accent-color',c.name); applyAccent(c); };
+    wrap.appendChild(s);
+    if(c.name===saved) applyAccent(c);
+  });
+}
+
+if('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js'); }); }
+
+// Check for saved code on load
+const savedCode = gl('journal_code');
+if(savedCode) { initApp(savedCode); }
 </script>
 </body>
 </html>
