@@ -187,6 +187,7 @@ body{padding-top:var(--safe-top);padding-bottom:var(--safe-bottom)}
         <button class="nav-tab" id="tab-stats" onclick="showView('stats')">Stats</button>
         <button class="nav-tab" id="tab-customize" onclick="showView('customize')">Customize</button>
         <button class="nav-tab" id="tab-settings" onclick="showView('settings')">Settings</button>
+        <button class="nav-tab" id="tab-about" onclick="showView('about')">About</button>
       </div>
     </div>
 
@@ -284,6 +285,86 @@ body{padding-top:var(--safe-top);padding-bottom:var(--safe-bottom)}
         <div class="section-label">Accent color</div>
         <div class="color-swatches" id="color-swatches"></div>
         <button class="signout-btn" onclick="signOut()">Sign out of this device</button>
+      </div>
+    </div>
+
+    <!-- ABOUT -->
+    <div id="about-view" class="view block">
+      <div class="content">
+        <div class="section-label" style="margin-top:0">What is The Plan?</div>
+        <p style="font-size:14px;line-height:1.7;color:var(--text-muted);margin-bottom:16px">The Plan is a personal daily journal app that lives on your phone's home screen. Each day you check off your habits, log what you did across your focus areas, and write a quick note. Your entries sync to the cloud so they're available on any device.</p>
+
+        <div class="section-label">Getting started</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+          <div style="background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px">
+            <div style="font-size:13px;font-weight:600;color:var(--accent);margin-bottom:4px">1 — Get an access code</div>
+            <div style="font-size:13px;color:var(--text-muted);line-height:1.6">You need an access code to sign in. Ask the person who shared this app with you for a code. Each code is yours — your journal data is private to your code.</div>
+          </div>
+          <div style="background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px">
+            <div style="font-size:13px;font-weight:600;color:var(--accent);margin-bottom:4px">2 — Install on your phone</div>
+            <div style="font-size:13px;color:var(--text-muted);line-height:1.6">Open this app in Safari (iPhone) or Chrome (Android). Tap the share icon and choose <em>Add to Home Screen</em>. The Plan will appear as a full-screen app on your home screen.</div>
+          </div>
+          <div style="background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px">
+            <div style="font-size:13px;font-weight:600;color:var(--accent);margin-bottom:4px">3 — Make it yours</div>
+            <div style="font-size:13px;color:var(--text-muted);line-height:1.6">Go to the <strong style="color:var(--text)">Customize</strong> tab to set up your own daily checklist items and focus areas. Your customizations are saved to your code and sync across all your devices.</div>
+          </div>
+          <div style="background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px">
+            <div style="font-size:13px;font-weight:600;color:var(--accent);margin-bottom:4px">4 — Use it daily</div>
+            <div style="font-size:13px;color:var(--text-muted);line-height:1.6">Open The Plan each day, check off your habits, log your activities, and hit <strong style="color:var(--text)">Save today</strong>. Your entry syncs to the cloud instantly.</div>
+          </div>
+        </div>
+
+        <div class="section-label">The tabs</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+          <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 14px;background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius)">
+            <div style="font-size:13px;font-weight:600;min-width:72px;color:var(--text)">Today</div>
+            <div style="font-size:13px;color:var(--text-muted);line-height:1.5">Your daily checklist, focus areas, mood check-in, and notes. Hit Save today when done.</div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 14px;background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius)">
+            <div style="font-size:13px;font-weight:600;min-width:72px;color:var(--text)">History</div>
+            <div style="font-size:13px;color:var(--text-muted);line-height:1.5">A calendar view of past entries. Tap any day to see what you logged.</div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 14px;background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius)">
+            <div style="font-size:13px;font-weight:600;min-width:72px;color:var(--text)">Stats</div>
+            <div style="font-size:13px;color:var(--text-muted);line-height:1.5">Monthly breakdown of your streak, perfect days, habit completion rates, and mood patterns.</div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 14px;background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius)">
+            <div style="font-size:13px;font-weight:600;min-width:72px;color:var(--text)">Customize</div>
+            <div style="font-size:13px;color:var(--text-muted);line-height:1.5">Add, rename, or remove checklist items and focus areas. Changes sync across your devices.</div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 14px;background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius)">
+            <div style="font-size:13px;font-weight:600;min-width:72px;color:var(--text)">Settings</div>
+            <div style="font-size:13px;color:var(--text-muted);line-height:1.5">Toggle dark mode, change the accent color, and sign out of this device.</div>
+          </div>
+        </div>
+
+        <div class="section-label">Focus area types</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+          <div style="padding:12px 14px;background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius)">
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">Log</div>
+            <div style="font-size:13px;color:var(--text-muted);line-height:1.5">Free-text entries — great for logging what you listened to, read, or watched.</div>
+          </div>
+          <div style="padding:12px 14px;background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius)">
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">Tags</div>
+            <div style="font-size:13px;color:var(--text-muted);line-height:1.5">Tap preset options to mark them done — ideal for exercise types or activities.</div>
+          </div>
+          <div style="padding:12px 14px;background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius)">
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">Checks</div>
+            <div style="font-size:13px;color:var(--text-muted);line-height:1.5">Checkboxes for a fixed list of items — good for recurring sub-habits.</div>
+          </div>
+          <div style="padding:12px 14px;background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius)">
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">Tasks</div>
+            <div style="font-size:13px;color:var(--text-muted);line-height:1.5">Add tasks on the fly each day and check them off — perfect for chores or to-dos that change daily.</div>
+          </div>
+        </div>
+
+        <div class="section-label">Tips</div>
+        <div style="font-size:13px;color:var(--text-muted);line-height:1.8;margin-bottom:32px">
+          · Save your entry before closing the app — it won't auto-save.<br>
+          · Your data is tied to your access code. If you use the same code on multiple devices, they share the same journal.<br>
+          · Clearing your browser data will sign you out, but your entries are safe in the cloud — just sign back in with your code.<br>
+          · Dark mode preference is saved per device, not per code.
+        </div>
       </div>
     </div>
 
