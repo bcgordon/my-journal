@@ -924,22 +924,23 @@ function renderWizard(){
       <div style="text-align:center;font-size:40px;margin-bottom:4px">🎉</div>
       <div class="wizard-title">You're all set!</div>
       <div class="wizard-sub">Here's your personal access code. Write it down — you'll need it to sign in on any device.</div>
-      <div class="code-display">
+      <div class="code-display" onclick="copyWizCode()" style="cursor:pointer">
         <div class="code-value" id="gen-code">${wizardState.generatedCode}</div>
-        <div class="code-hint">Tap to copy</div>
+        <div class="code-hint" id="copy-hint">Tap to copy</div>
       </div>
       <div style="font-size:13px;color:var(--text-hint);text-align:center;line-height:1.5">This code is yours. Anyone with it can access your journal, so keep it safe.</div>
       <button class="wizard-btn" id="wiz-create-btn" onclick="createAccount()">Start journaling →</button>
       <div id="wiz-create-error" style="font-size:13px;color:#D85A30;text-align:center"></div>`;
-    document.getElementById('gen-code').addEventListener('click',()=>{
-      navigator.clipboard.writeText(wizardState.generatedCode).then(()=>{
-        document.querySelector('.code-hint').textContent='Copied!';
-        setTimeout(()=>{const h=document.querySelector('.code-hint');if(h)h.textContent='Tap to copy';},2000);
-      }).catch(()=>{});
-    });
   }
 
   wrap.appendChild(step);
+}
+
+function copyWizCode(){
+  navigator.clipboard.writeText(wizardState.generatedCode).then(()=>{
+    const h=document.getElementById('copy-hint');if(h)h.textContent='Copied!';
+    setTimeout(()=>{const h2=document.getElementById('copy-hint');if(h2)h2.textContent='Tap to copy';},2000);
+  }).catch(()=>{});
 }
 
 function selectBundle(id){
