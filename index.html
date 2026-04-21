@@ -171,6 +171,34 @@ body{padding-top:var(--safe-top);padding-bottom:var(--safe-bottom)}
 .swatch{width:44px;height:44px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all 0.15s}
 .swatch.selected{border-color:var(--text)}
 .signout-btn{margin-top:32px;width:100%;padding:12px;border-radius:var(--radius-lg);border:0.5px solid var(--border-mid);background:transparent;color:var(--text-muted);font-size:14px;font-family:inherit;cursor:pointer}
+.wizard-dot{width:8px;height:8px;border-radius:50%;background:var(--border-mid);transition:all 0.2s}
+.wizard-dot.active{background:var(--accent);width:20px;border-radius:4px}
+.wizard-dot.done{background:var(--accent-mid)}
+.wizard-step{width:100%;display:flex;flex-direction:column;gap:20px}
+.wizard-title{font-size:22px;font-weight:600;color:var(--text);text-align:center}
+.wizard-sub{font-size:14px;color:var(--text-muted);text-align:center;line-height:1.5}
+.bundle-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bundle-card{border:0.5px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-card);padding:16px 14px;cursor:pointer;text-align:center;transition:all 0.15s;user-select:none}
+.bundle-card.selected{border-color:var(--accent);border-width:2px;background:var(--accent-light)}
+.bundle-card.selected .bundle-name{color:var(--accent-dark)}
+.bundle-icon{font-size:28px;margin-bottom:8px}
+.bundle-name{font-size:14px;font-weight:500;color:var(--text);margin-bottom:4px}
+.bundle-desc{font-size:11px;color:var(--text-hint);line-height:1.4}
+.wizard-checklist{display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto}
+.wizard-check{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:var(--radius);border:0.5px solid var(--border);background:var(--bg-card);cursor:pointer;user-select:none;transition:all 0.15s}
+.wizard-check.on{border-color:var(--accent-mid);background:var(--accent-light)}
+.wizard-check.on .wc-label{color:var(--accent-dark)}
+.wc-box{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border-mid);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.wizard-check.on .wc-box{background:var(--accent);border-color:var(--accent)}
+.wc-mark{width:9px;height:6px;border-left:2px solid white;border-bottom:2px solid white;transform:rotate(-45deg) translate(1px,-1px);opacity:0}
+.wizard-check.on .wc-mark{opacity:1}
+.wc-label{font-size:14px;color:var(--text)}
+.code-display{background:var(--bg-surface);border:0.5px solid var(--border-mid);border-radius:var(--radius-lg);padding:18px;text-align:center}
+.code-value{font-size:22px;font-weight:600;color:var(--accent);letter-spacing:0.04em;word-break:break-all}
+.code-hint{font-size:12px;color:var(--text-hint);margin-top:8px}
+.wizard-btn{width:100%;padding:14px;border-radius:var(--radius-lg);border:none;background:var(--accent);color:white;font-size:16px;font-weight:600;font-family:inherit;cursor:pointer}
+.wizard-btn:disabled{opacity:0.5}
+.wizard-back{background:none;border:none;color:var(--text-muted);font-size:14px;font-family:inherit;cursor:pointer;text-align:center;padding:4px}
 </style>
 </head>
 <body>
@@ -184,6 +212,17 @@ body{padding-top:var(--safe-top);padding-bottom:var(--safe-bottom)}
     <input class="signin-input" id="code-input" type="text" placeholder="enter your access code" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
     <button class="signin-btn" id="signin-btn" onclick="submitCode()">Enter</button>
     <div class="signin-error" id="signin-error"></div>
+    <button onclick="showRegister()" style="background:none;border:none;color:var(--accent);font-size:14px;font-family:inherit;cursor:pointer;text-decoration:underline;padding:0">New here? Create an account</button>
+  </div>
+
+  <!-- REGISTER / ONBOARDING -->
+  <div class="signin-screen" id="register-screen" style="display:none;gap:0;justify-content:flex-start;padding-top:60px">
+    <div style="width:100%">
+      <!-- Step indicator -->
+      <div style="display:flex;gap:6px;justify-content:center;margin-bottom:32px" id="wizard-dots"></div>
+      <!-- Steps -->
+      <div id="wizard-steps" style="width:100%"></div>
+    </div>
   </div>
 
   <!-- MAIN APP -->
@@ -746,10 +785,265 @@ function showView(v){
   if(v==='about'){}
 }
 
+
+// ── REGISTRATION & ONBOARDING WIZARD ──────────────────────────────────────
+
+const ADJECTIVES=['amber','bloom','cedar','dusk','ember','frost','golden','haven','indigo','jasper','keen','linden','mellow','noble','opal','pine','quiet','river','sage','tidal','umber','velvet','willow','zephyr'];
+const NOUNS=['anchor','bay','birch','brook','cask','cliff','cove','creek','dale','dew','drift','dune','fern','fjord','grove','gale','harbor','heath','isle','knoll','lark','lea','mead','mist','moon','moss','peak','raft','reef','ridge','run','shore','silt','sky','slab','spring','stone','surf','tide','vale','vine','wake','wave','wren'];
+
+function genCode(){
+  const adj=ADJECTIVES[Math.floor(Math.random()*ADJECTIVES.length)];
+  const noun=NOUNS[Math.floor(Math.random()*NOUNS.length)];
+  const num=Math.floor(Math.random()*9000)+1000;
+  return adj+'-'+noun+'-'+num;
+}
+
+const BUNDLES=[
+  {
+    id:'health',icon:'🏃',name:'Health & Fitness',desc:'Movement, sleep & wellness',
+    checklist:['Morning sunlight','Exercise','Drink water','Eat well','Sleep 7h+','Take vitamins','Stretch','Limit screen time'],
+    focusAreas:[
+      {name:'Movement',type:'tags',items:['Walk','Run','Gym','Yoga','Swim','Cycle','HIIT']},
+      {name:'Nutrition',type:'log'},
+      {name:'Wellbeing',type:'checks',items:['Meditate','Journal','Fresh air','Early bed']}
+    ]
+  },
+  {
+    id:'work',icon:'💼',name:'Work & Focus',desc:'Deep work & productivity',
+    checklist:['Morning review','Deep work block','Clear inbox','Move your body','Plan tomorrow','Limit social media','Read','Wind down'],
+    focusAreas:[
+      {name:'Projects',type:'tasks'},
+      {name:'Wins',type:'log'},
+      {name:'Focus',type:'checks',items:['No meetings before 10','Phone away','Pomodoro sessions','Single-tasking']}
+    ]
+  },
+  {
+    id:'creative',icon:'🎨',name:'Creative Life',desc:'Make things every day',
+    checklist:['Create something','Get outside','Read','Listen to music','Limit news','Connect with someone','Rest','Reflect'],
+    focusAreas:[
+      {name:'Making',type:'log'},
+      {name:'Listening',type:'log'},
+      {name:'Inspiration',type:'tags',items:['Music','Books','Art','Film','Nature','Conversation','Exhibition']}
+    ]
+  },
+  {
+    id:'mindful',icon:'🧘',name:'Mindful Living',desc:'Presence & intention',
+    checklist:['Morning quiet','Meditate','Gratitude','Move gently','Eat mindfully','Digital detox','Connect','Evening reflection'],
+    focusAreas:[
+      {name:'Gratitude',type:'log'},
+      {name:'Practices',type:'checks',items:['Breathing','Body scan','Mindful walk','Journaling','No phone morning']},
+      {name:'Mood notes',type:'log'}
+    ]
+  },
+  {
+    id:'blank',icon:'✏️',name:'Start Blank',desc:'Build your own from scratch',
+    checklist:['Morning routine','Exercise','Read','Connect with someone'],
+    focusAreas:[{name:'Daily tasks',type:'tasks'}]
+  }
+];
+
+let wizardState={step:0,name:'',bundleId:null,checklist:[],generatedCode:null};
+const WIZARD_STEPS=4;
+
+function showRegister(){
+  document.getElementById('signin-screen').style.display='none';
+  document.getElementById('register-screen').style.display='flex';
+  wizardState={step:0,name:'',bundleId:null,checklist:[],generatedCode:null};
+  renderWizard();
+}
+
+function renderWizardDots(){
+  const wrap=document.getElementById('wizard-dots');
+  wrap.innerHTML='';
+  for(let i=0;i<WIZARD_STEPS;i++){
+    const d=document.createElement('div');
+    d.className='wizard-dot'+(i===wizardState.step?' active':i<wizardState.step?' done':'');
+    wrap.appendChild(d);
+  }
+}
+
+function renderWizard(){
+  renderWizardDots();
+  const wrap=document.getElementById('wizard-steps');
+  wrap.innerHTML='';
+  const step=document.createElement('div');
+  step.className='wizard-step';
+
+  if(wizardState.step===0){
+    // Name
+    step.innerHTML=`
+      <div class="wizard-title">Welcome 👋</div>
+      <div class="wizard-sub">The Plan is your daily habit journal. Let's get you set up in about a minute.</div>
+      <div>
+        <div style="font-size:12px;font-weight:600;letter-spacing:0.06em;color:var(--text-muted);text-transform:uppercase;margin-bottom:8px">What should we call you?</div>
+        <input id="wiz-name" class="signin-input" type="text" placeholder="Your first name" autocomplete="given-name" style="text-align:left" value="${wizardState.name}" />
+      </div>
+      <button class="wizard-btn" onclick="wizNext()">Continue</button>
+      <button class="wizard-back" onclick="showSignin()">← Back to sign in</button>`;
+    setTimeout(()=>{const n=document.getElementById('wiz-name');if(n){n.focus();n.addEventListener('keydown',e=>{if(e.key==='Enter')wizNext();});}},50);
+
+  } else if(wizardState.step===1){
+    // Bundle picker
+    const bundleCards=BUNDLES.map(b=>`
+      <div class="bundle-card${wizardState.bundleId===b.id?' selected':''}" onclick="selectBundle('${b.id}')">
+        <div class="bundle-icon">${b.icon}</div>
+        <div class="bundle-name">${b.name}</div>
+        <div class="bundle-desc">${b.desc}</div>
+      </div>`).join('');
+    step.innerHTML=`
+      <div class="wizard-title">Hi ${wizardState.name}! 👋</div>
+      <div class="wizard-sub">Pick a starting template — you can customise everything later.</div>
+      <div class="bundle-grid">${bundleCards}</div>
+      <button class="wizard-btn" id="wiz-next-btn" onclick="wizNext()" ${wizardState.bundleId?'':'disabled'}>Continue</button>
+      <button class="wizard-back" onclick="wizBack()">← Back</button>`;
+
+  } else if(wizardState.step===2){
+    // Checklist customiser
+    const bundle=BUNDLES.find(b=>b.id===wizardState.bundleId);
+    if(!wizardState.checklist.length) wizardState.checklist=[...bundle.checklist];
+    const items=wizardState.checklist.map((item,i)=>`
+      <div class="wizard-check on" id="wc-${i}" onclick="toggleWizCheck(${i})">
+        <div class="wc-box"><div class="wc-mark"></div></div>
+        <span class="wc-label">${item}</span>
+      </div>`).join('');
+    step.innerHTML=`
+      <div class="wizard-title">Your checklist</div>
+      <div class="wizard-sub">These are your daily habits. Tap any to remove, or add your own.</div>
+      <div class="wizard-checklist">${items}</div>
+      <div style="display:flex;gap:8px">
+        <input id="wiz-add-input" class="signin-input" type="text" placeholder="Add an item..." style="text-align:left;padding:12px 14px;font-size:14px" />
+        <button class="add-btn" onclick="wizAddCheck()" style="flex-shrink:0">+</button>
+      </div>
+      <button class="wizard-btn" onclick="wizNext()">Continue</button>
+      <button class="wizard-back" onclick="wizBack()">← Back</button>`;
+    setTimeout(()=>{const inp=document.getElementById('wiz-add-input');if(inp)inp.addEventListener('keydown',e=>{if(e.key==='Enter')wizAddCheck();});},50);
+
+  } else if(wizardState.step===3){
+    // Done — show generated code
+    if(!wizardState.generatedCode) wizardState.generatedCode=genCode();
+    step.innerHTML=`
+      <div style="text-align:center;font-size:40px;margin-bottom:4px">🎉</div>
+      <div class="wizard-title">You're all set!</div>
+      <div class="wizard-sub">Here's your personal access code. Write it down — you'll need it to sign in on any device.</div>
+      <div class="code-display">
+        <div class="code-value" id="gen-code">${wizardState.generatedCode}</div>
+        <div class="code-hint">Tap to copy</div>
+      </div>
+      <div style="font-size:13px;color:var(--text-hint);text-align:center;line-height:1.5">This code is yours. Anyone with it can access your journal, so keep it safe.</div>
+      <button class="wizard-btn" id="wiz-create-btn" onclick="createAccount()">Start journaling →</button>
+      <div id="wiz-create-error" style="font-size:13px;color:#D85A30;text-align:center"></div>`;
+    document.getElementById('gen-code').addEventListener('click',()=>{
+      navigator.clipboard.writeText(wizardState.generatedCode).then(()=>{
+        document.querySelector('.code-hint').textContent='Copied!';
+        setTimeout(()=>{const h=document.querySelector('.code-hint');if(h)h.textContent='Tap to copy';},2000);
+      }).catch(()=>{});
+    });
+  }
+
+  wrap.appendChild(step);
+}
+
+function selectBundle(id){
+  wizardState.bundleId=id;
+  wizardState.checklist=[];
+  renderWizard();
+}
+
+function toggleWizCheck(i){
+  const el=document.getElementById('wc-'+i);
+  if(!el)return;
+  el.classList.toggle('on');
+}
+
+function wizAddCheck(){
+  const inp=document.getElementById('wiz-add-input');
+  const v=inp.value.trim();if(!v)return;
+  wizardState.checklist.push(v);
+  inp.value='';
+  renderWizard();
+}
+
+function wizNext(){
+  if(wizardState.step===0){
+    const n=document.getElementById('wiz-name');
+    const v=(n?n.value.trim():'');
+    if(!v){n&&(n.style.borderColor='#D85A30');return;}
+    wizardState.name=v;
+  }
+  if(wizardState.step===1 && !wizardState.bundleId) return;
+  if(wizardState.step===2){
+    // Collect current checked state from DOM
+    const bundle=BUNDLES.find(b=>b.id===wizardState.bundleId);
+    const base=[...bundle.checklist];
+    // Find any extras added
+    const extras=wizardState.checklist.filter(x=>!base.includes(x));
+    const all=[...base,...extras];
+    const kept=all.filter((_,i)=>{
+      const el=document.getElementById('wc-'+i);
+      return el?el.classList.contains('on'):true;
+    });
+    // Also keep extras that were added (they appear after base items)
+    const extrasKept=extras.filter(x=>{
+      const idx=all.indexOf(x);
+      const el=document.getElementById('wc-'+idx);
+      return el?el.classList.contains('on'):true;
+    });
+    wizardState.checklist=kept.length?kept:['Morning routine'];
+  }
+  wizardState.step=Math.min(wizardState.step+1,WIZARD_STEPS-1);
+  renderWizard();
+}
+
+function wizBack(){
+  wizardState.step=Math.max(wizardState.step-1,0);
+  renderWizard();
+}
+
+function showSignin(){
+  document.getElementById('register-screen').style.display='none';
+  document.getElementById('signin-screen').style.display='flex';
+}
+
+async function createAccount(){
+  const btn=document.getElementById('wiz-create-btn');
+  const err=document.getElementById('wiz-create-error');
+  btn.disabled=true;btn.textContent='Creating...';
+  const code=wizardState.generatedCode;
+  const bundle=BUNDLES.find(b=>b.id===wizardState.bundleId);
+  const newSettings={
+    checklist:wizardState.checklist,
+    focusAreas:bundle.focusAreas
+  };
+  try{
+    // Insert code row — name column may not exist, so try with it first then without
+    try{
+      await sbFetch('journal_codes',{method:'POST',prefer:'return=minimal',body:JSON.stringify({code,name:wizardState.name})});
+    }catch(e2){
+      await sbFetch('journal_codes',{method:'POST',prefer:'return=minimal',body:JSON.stringify({code})});
+    }
+    // Insert settings row
+    await sbFetch('journal_settings',{method:'POST',prefer:'return=minimal',body:JSON.stringify({code,data:newSettings})});
+    // Sign in
+    sl('journal_code',code);
+    document.getElementById('register-screen').style.display='none';
+    initApp(code);
+  }catch(e){
+    // Code collision — generate a new one and retry automatically
+    if(e.message&&e.message.includes('duplicate')){
+      wizardState.generatedCode=genCode();
+      createAccount();
+    }else{
+      err.textContent='Something went wrong. Please try again.';
+      btn.disabled=false;btn.textContent='Start journaling →';
+    }
+  }
+}
+
 if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js');});}
 initTheme();
 const savedCode=gl('journal_code');
 if(savedCode){initApp(savedCode);}
+
 </script>
 </body>
 </html>
