@@ -171,6 +171,14 @@ body{padding-top:var(--safe-top);padding-bottom:var(--safe-bottom)}
 .swatch{width:44px;height:44px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all 0.15s}
 .swatch.selected{border-color:var(--text)}
 .signout-btn{margin-top:32px;width:100%;padding:12px;border-radius:var(--radius-lg);border:0.5px solid var(--border-mid);background:transparent;color:var(--text-muted);font-size:14px;font-family:inherit;cursor:pointer}
+.adm-input{width:100%;border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;font-size:14px;font-family:inherit;color:var(--text);background:var(--bg-card);outline:none}
+.adm-input:focus{border-color:var(--accent)}
+.adm-textarea{width:100%;border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;font-size:14px;font-family:inherit;color:var(--text);background:var(--bg-card);outline:none;resize:vertical;line-height:1.5}
+.adm-textarea:focus{border-color:var(--accent)}
+.adm-pillar-block{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.adm-pillar-row{display:flex;gap:8px;align-items:center}
+.adm-pillar-emoji{width:44px;border:0.5px solid var(--border);border-radius:var(--radius);padding:8px;font-size:16px;font-family:inherit;color:var(--text);background:var(--bg-card);outline:none;text-align:center}
+.adm-section-mini{font-size:11px;color:var(--text-hint);margin-bottom:2px}
 .welcome-sheet{background:var(--bg);border-radius:24px 24px 0 0;padding:20px 24px 40px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
 .welcome-pillar{display:flex;align-items:flex-start;gap:14px;padding:12px 14px;background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg)}
 .welcome-pillar-icon{font-size:22px;flex-shrink:0;margin-top:1px}
@@ -232,49 +240,7 @@ body{padding-top:var(--safe-top);padding-bottom:var(--safe-bottom)}
 
   <!-- WELCOME OVERLAY (shown once on first login) -->
   <div id="welcome-overlay" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(10,8,5,0.7);align-items:flex-end;justify-content:center">
-    <div class="welcome-sheet">
-      <div class="welcome-anchor-bar">
-        <div style="width:36px;height:4px;border-radius:2px;background:var(--border-mid);margin:0 auto 20px"></div>
-        <div style="text-align:center;margin-bottom:4px">
-          <span style="font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#8B7FD4">The Runaway Anchor</span>
-        </div>
-        <div style="font-size:22px;font-weight:600;color:var(--text);text-align:center;margin-bottom:12px;line-height:1.3">Welcome to<br>The Plan</div>
-      </div>
-      <p style="font-size:15px;line-height:1.7;color:var(--text-muted);margin-bottom:16px">The drink is a doorway. That's the idea at the heart of The Runaway Anchor — that gathering around a table, raising a glass, and asking good questions is one of the most powerful things human beings can do together.</p>
-      <p style="font-size:15px;line-height:1.7;color:var(--text-muted);margin-bottom:20px">The Plan is built on that same belief. It's a daily habit journal designed to help you live more intentionally — not by optimising yourself, but by showing up, paying attention, and making small choices that add up to a life that feels like yours.</p>
-      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
-        <div class="welcome-pillar">
-          <div class="welcome-pillar-icon">🥂</div>
-          <div>
-            <div class="welcome-pillar-title">The Table</div>
-            <div class="welcome-pillar-desc">Cocktails &amp; mocktails — the original Runaway Anchor. Every recipe is an invitation to gather.</div>
-          </div>
-        </div>
-        <div class="welcome-pillar">
-          <div class="welcome-pillar-icon">🌿</div>
-          <div>
-            <div class="welcome-pillar-title">Find Enough</div>
-            <div class="welcome-pillar-desc">An app about recognising contentment. The art of knowing when you have what you need.</div>
-          </div>
-        </div>
-        <div class="welcome-pillar">
-          <div class="welcome-pillar-icon">📓</div>
-          <div>
-            <div class="welcome-pillar-title">The Plan</div>
-            <div class="welcome-pillar-desc">You're here. Daily habits, focus areas, and reflection — built for intentional living.</div>
-          </div>
-        </div>
-        <div class="welcome-pillar">
-          <div class="welcome-pillar-icon">✍️</div>
-          <div>
-            <div class="welcome-pillar-title">Letters from BC Gordon</div>
-            <div class="welcome-pillar-desc">Writing on connection and meaning. Find it on Substack.</div>
-          </div>
-        </div>
-      </div>
-      <button class="signin-btn" onclick="dismissWelcome()" style="margin-bottom:8px">Let's go →</button>
-      <p style="font-size:12px;color:var(--text-hint);text-align:center">From BC Gordon &amp; the five founders of The Runaway Anchor</p>
-    </div>
+    <div class="welcome-sheet" id="welcome-sheet-inner"></div>
   </div>
   <div class="main-app" id="main-app">
     <div class="header">
@@ -289,6 +255,7 @@ body{padding-top:var(--safe-top);padding-bottom:var(--safe-bottom)}
         <button class="nav-tab" id="tab-stats" onclick="showView('stats')">Stats</button>
         <button class="nav-tab" id="tab-settings" onclick="showView('settings')">Settings</button>
         <button class="nav-tab" id="tab-about" onclick="showView('about')">About</button>
+        <button class="nav-tab" id="tab-admin" onclick="showView('admin')" style="display:none">⚙ Admin</button>
       </div>
     </div>
 
@@ -471,68 +438,81 @@ body{padding-top:var(--safe-top);padding-bottom:var(--safe-bottom)}
         </div>
 
         <div class="section-label">About The Runaway Anchor</div>
-        <div style="border-radius:var(--radius-lg);overflow:hidden;border:0.5px solid var(--border);margin-bottom:16px">
-          <div style="background:#534AB7;padding:20px 18px">
-            <div style="font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:6px">Social Wellness Company</div>
-            <div style="font-size:20px;font-weight:600;color:white;line-height:1.3;margin-bottom:10px">The drink is a doorway.</div>
-            <div style="font-size:14px;color:rgba(255,255,255,0.8);line-height:1.6">The Runaway Anchor started as a place for cocktails and mocktails. It's becoming something larger — a company built around the idea that gathering, connecting, and living well together is one of the most important things we can do.</div>
+        <div id="about-brand-section"></div>
+      </div>
+    </div>
+
+    <!-- ADMIN -->
+    <div id="admin-view" class="view block">
+      <div class="content">
+        <div class="section-label" style="margin-top:0">Content editor</div>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.6">Edit the welcome screen and About section text. Changes go live for all users instantly.</p>
+
+        <div class="section-label">Welcome screen</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px">
+          <div>
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Headline</div>
+            <input id="adm-welcome-title" class="adm-input" type="text" />
           </div>
-          <div style="background:var(--bg-card);padding:16px 18px">
-            <div style="font-size:13px;color:var(--text-muted);line-height:1.7">Founded by BC Gordon and four co-founders, The Runaway Anchor is expanding into a <em>social wellness company</em> — a brand and community dedicated to the art of living intentionally with other people. Not self-optimisation. Not productivity theatre. Just the quiet, consistent practice of showing up for your life and the people in it.</div>
+          <div>
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">First paragraph</div>
+            <textarea id="adm-welcome-p1" class="adm-textarea" rows="3"></textarea>
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Second paragraph</div>
+            <textarea id="adm-welcome-p2" class="adm-textarea" rows="3"></textarea>
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Footer line</div>
+            <input id="adm-welcome-footer" class="adm-input" type="text" />
           </div>
         </div>
 
-        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
-          <div style="background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px">
-            <div style="font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8B7FD4;margin-bottom:8px">What we make</div>
-            <div style="display:flex;flex-direction:column;gap:12px">
-              <div style="display:flex;gap:12px;align-items:flex-start">
-                <span style="font-size:20px;flex-shrink:0">🥂</span>
-                <div>
-                  <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px">The Table</div>
-                  <div style="font-size:13px;color:var(--text-muted);line-height:1.5">Our original home — cocktails, mocktails, and the culture of gathering. Every recipe is an invitation to slow down and share something with someone.</div>
-                </div>
-              </div>
-              <div style="display:flex;gap:12px;align-items:flex-start">
-                <span style="font-size:20px;flex-shrink:0">🌿</span>
-                <div>
-                  <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px">Find Enough</div>
-                  <div style="font-size:13px;color:var(--text-muted);line-height:1.5">An app about contentment. In a world that always wants more, Find Enough helps you recognise when you already have what you need.</div>
-                </div>
-              </div>
-              <div style="display:flex;gap:12px;align-items:flex-start">
-                <span style="font-size:20px;flex-shrink:0">📓</span>
-                <div>
-                  <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px">The Plan</div>
-                  <div style="font-size:13px;color:var(--text-muted);line-height:1.5">The app you're using right now. A daily habit journal for intentional living — check in, track what matters, and reflect on your days.</div>
-                </div>
-              </div>
-              <div style="display:flex;gap:12px;align-items:flex-start">
-                <span style="font-size:20px;flex-shrink:0">✍️</span>
-                <div>
-                  <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px">Letters from BC Gordon</div>
-                  <div style="font-size:13px;color:var(--text-muted);line-height:1.5">Writing on connection, meaning, and the texture of everyday life. Published on Substack — equal parts personal essay and open letter.</div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div style="font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);margin:16px 0 8px">Welcome pillars</div>
+        <div id="adm-pillars" style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px"></div>
 
-          <div style="background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px">
-            <div style="font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8B7FD4;margin-bottom:8px">What we believe</div>
-            <div style="display:flex;flex-direction:column;gap:8px">
-              <div style="font-size:13px;color:var(--text-muted);line-height:1.6;padding:10px 12px;background:var(--bg-surface);border-radius:var(--radius);border-left:3px solid #534AB7">"Social wellness isn't about being social. It's about the quality of your presence — with yourself, with others, and with the life you're actually living."</div>
-              <div style="font-size:13px;color:var(--text-muted);line-height:1.6">We believe the small rituals matter. The morning check-in. The evening drink with a friend. The question asked across a table that changes how you see something. These aren't distractions from a meaningful life — they <em>are</em> the meaningful life.</div>
-            </div>
+        <div class="section-label">About — brand section</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px">
+          <div>
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Hero headline</div>
+            <input id="adm-about-headline" class="adm-input" type="text" />
           </div>
-
-          <div style="background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px">
-            <div style="font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8B7FD4;margin-bottom:8px">The five founders</div>
-            <div style="font-size:13px;color:var(--text-muted);line-height:1.6">The Runaway Anchor is a collaboration. Five co-founders, one shared belief that the world needs more spaces — digital and physical — dedicated to genuine human connection. This is early days, and we're building in the open.</div>
+          <div>
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Hero body</div>
+            <textarea id="adm-about-hero-body" class="adm-textarea" rows="3"></textarea>
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Mission paragraph</div>
+            <textarea id="adm-about-mission" class="adm-textarea" rows="3"></textarea>
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Pull quote</div>
+            <textarea id="adm-about-quote" class="adm-textarea" rows="2"></textarea>
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Beliefs paragraph</div>
+            <textarea id="adm-about-beliefs" class="adm-textarea" rows="3"></textarea>
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Founders paragraph</div>
+            <textarea id="adm-about-founders" class="adm-textarea" rows="3"></textarea>
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Footer tagline</div>
+            <input id="adm-about-footer" class="adm-input" type="text" />
           </div>
         </div>
 
-        <div style="text-align:center;padding-bottom:32px">
-          <div style="font-size:12px;color:var(--text-hint);line-height:1.8">The Runaway Anchor · Est. 2023<br>Cocktails &amp; Mocktails · Social Wellness · Intentional Living</div>
+        <div style="font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);margin:16px 0 8px">About — property cards</div>
+        <div id="adm-properties" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px"></div>
+
+        <div id="adm-save-status" style="font-size:12px;color:var(--text-hint);text-align:center;min-height:18px"></div>
+        <button class="cust-save-btn" id="adm-save-btn" onclick="saveContent()">Save &amp; publish</button>
+
+        <div style="margin-top:20px;padding:14px;background:var(--bg-surface);border-radius:var(--radius);border:0.5px solid var(--border)">
+          <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px">Reset welcome screen</div>
+          <div style="font-size:12px;color:var(--text-hint);margin-bottom:10px">Clear the "seen" flag so the welcome overlay appears again on next login — useful for testing.</div>
+          <button onclick="localStorage.removeItem('welcome_seen');alert('Done — sign out and back in to see it.')" style="font-size:13px;border:0.5px solid var(--border-mid);border-radius:var(--radius);background:transparent;padding:8px 14px;color:var(--text-muted);cursor:pointer;font-family:inherit">Reset for this device</button>
         </div>
       </div>
     </div>
@@ -588,6 +568,7 @@ document.getElementById('code-input').addEventListener('keydown',e=>{if(e.key===
 function signOut(){if(!confirm('Sign out of this device?'))return;localStorage.removeItem('journal_code');location.reload();}
 
 function showWelcome(){
+  renderWelcomeOverlay();
   const overlay=document.getElementById('welcome-overlay');
   overlay.style.display='flex';
 }
@@ -604,10 +585,13 @@ async function initApp(code){
   document.getElementById('header-sub').textContent=MONTHS[now.getMonth()]+' '+now.getDate()+', '+now.getFullYear();
   const savedTheme=gl('theme');if(savedTheme){const t=document.getElementById('dark-toggle');if(t)t.checked=(savedTheme==='dark');}
   buildSwatches();
+  await loadContent();
   await loadSettings();
   await loadAllEntries();
   loadToday();
   renderTodayUI();
+  renderAboutBrand();
+  if(code===ADMIN_CODE){const tab=document.getElementById('tab-admin');if(tab)tab.style.display='';}
   if(!gl('welcome_seen')) showWelcome();
 }
 
@@ -907,11 +891,211 @@ function showView(v){
   if(v==='history'){calYear=now.getFullYear();calMonth=now.getMonth();selectedDay=null;document.getElementById('past-entry-display').innerHTML='';renderCal();}
   if(v==='stats')renderStats();
   if(v==='settings'){if(!custSettings)custSettings=JSON.parse(JSON.stringify(settings));renderCustomize();const t=document.getElementById('dark-toggle');if(t)t.checked=gl('theme')==='dark';}
+  if(v==='admin')renderAdminEditor();
   if(v==='about'){}
 }
 
 
-// ── REGISTRATION & ONBOARDING WIZARD ──────────────────────────────────────
+
+// ── CONTENT MANAGEMENT ────────────────────────────────────────────────────
+
+const ADMIN_CODE='132567786';
+
+const DEFAULT_CONTENT={
+  welcome:{
+    title:'Welcome to\nThe Plan',
+    p1:"The drink is a doorway. That's the idea at the heart of The Runaway Anchor — that gathering around a table, raising a glass, and asking good questions is one of the most powerful things human beings can do together.",
+    p2:"The Plan is built on that same belief. It's a daily habit journal designed to help you live more intentionally — not by optimising yourself, but by showing up, paying attention, and making small choices that add up to a life that feels like yours.",
+    footer:'From BC Gordon & the five founders of The Runaway Anchor',
+    pillars:[
+      {icon:'🥂',title:'The Table',desc:'Cocktails & mocktails — the original Runaway Anchor. Every recipe is an invitation to gather.'},
+      {icon:'🌿',title:'Find Enough',desc:'An app about recognising contentment. The art of knowing when you have what you need.'},
+      {icon:'📓',title:'The Plan',desc:"You're here. Daily habits, focus areas, and reflection — built for intentional living."},
+      {icon:'✍️',title:'Letters from BC Gordon',desc:'Writing on connection and meaning. Find it on Substack.'}
+    ]
+  },
+  about:{
+    headline:'The drink is a doorway.',
+    heroBody:'The Runaway Anchor started as a place for cocktails and mocktails. It\'s becoming something larger — a company built around the idea that gathering, connecting, and living well together is one of the most important things we can do.',
+    mission:'Founded by BC Gordon and four co-founders, The Runaway Anchor is expanding into a social wellness company — a brand and community dedicated to the art of living intentionally with other people. Not self-optimisation. Not productivity theatre. Just the quiet, consistent practice of showing up for your life and the people in it.',
+    quote:"Social wellness isn't about being social. It's about the quality of your presence — with yourself, with others, and with the life you're actually living.",
+    beliefs:"We believe the small rituals matter. The morning check-in. The evening drink with a friend. The question asked across a table that changes how you see something. These aren't distractions from a meaningful life — they are the meaningful life.",
+    founders:'The Runaway Anchor is a collaboration. Five co-founders, one shared belief that the world needs more spaces — digital and physical — dedicated to genuine human connection. This is early days, and we\'re building in the open.',
+    footer:'The Runaway Anchor · Est. 2023 · Cocktails & Mocktails · Social Wellness · Intentional Living',
+    properties:[
+      {icon:'🥂',title:'The Table',desc:'Our original home — cocktails, mocktails, and the culture of gathering. Every recipe is an invitation to slow down and share something with someone.'},
+      {icon:'🌿',title:'Find Enough',desc:'An app about contentment. In a world that always wants more, Find Enough helps you recognise when you already have what you need.'},
+      {icon:'📓',title:'The Plan',desc:"The app you're using right now. A daily habit journal for intentional living — check in, track what matters, and reflect on your days."},
+      {icon:'✍️',title:'Letters from BC Gordon',desc:'Writing on connection, meaning, and the texture of everyday life. Published on Substack — equal parts personal essay and open letter.'}
+    ]
+  }
+};
+
+let siteContent=JSON.parse(JSON.stringify(DEFAULT_CONTENT));
+
+async function loadContent(){
+  try{
+    const rows=await sbFetch('site_content?id=eq.1&select=data');
+    if(rows&&rows.length>0&&rows[0].data) siteContent=rows[0].data;
+  }catch(e){}
+}
+
+async function saveContent(){
+  // Collect values from admin form
+  const c=JSON.parse(JSON.stringify(siteContent));
+  c.welcome.title=document.getElementById('adm-welcome-title').value;
+  c.welcome.p1=document.getElementById('adm-welcome-p1').value;
+  c.welcome.p2=document.getElementById('adm-welcome-p2').value;
+  c.welcome.footer=document.getElementById('adm-welcome-footer').value;
+  c.about.headline=document.getElementById('adm-about-headline').value;
+  c.about.heroBody=document.getElementById('adm-about-hero-body').value;
+  c.about.mission=document.getElementById('adm-about-mission').value;
+  c.about.quote=document.getElementById('adm-about-quote').value;
+  c.about.beliefs=document.getElementById('adm-about-beliefs').value;
+  c.about.founders=document.getElementById('adm-about-founders').value;
+  c.about.footer=document.getElementById('adm-about-footer').value;
+  // Pillars
+  c.welcome.pillars=c.welcome.pillars.map((_,i)=>({
+    icon:document.getElementById('adm-pillar-icon-'+i).value,
+    title:document.getElementById('adm-pillar-title-'+i).value,
+    desc:document.getElementById('adm-pillar-desc-'+i).value
+  }));
+  // Properties
+  c.about.properties=c.about.properties.map((_,i)=>({
+    icon:document.getElementById('adm-prop-icon-'+i).value,
+    title:document.getElementById('adm-prop-title-'+i).value,
+    desc:document.getElementById('adm-prop-desc-'+i).value
+  }));
+  const btn=document.getElementById('adm-save-btn');
+  const status=document.getElementById('adm-save-status');
+  btn.disabled=true;btn.textContent='Publishing...';
+  try{
+    const rows=await sbFetch('site_content?id=eq.1&select=id');
+    if(rows&&rows.length>0){
+      await sbFetch('site_content?id=eq.1',{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:c})});
+    }else{
+      await sbFetch('site_content',{method:'POST',prefer:'return=minimal',body:JSON.stringify({id:1,data:c})});
+    }
+    siteContent=c;
+    renderAboutBrand();
+    status.textContent='Published ✓';status.style.color='var(--accent)';
+    setTimeout(()=>{status.textContent='';btn.textContent='Save & publish';btn.disabled=false;},2500);
+  }catch(e){
+    status.textContent='Error — check Supabase site_content table exists';status.style.color='#D85A30';
+    btn.textContent='Save & publish';btn.disabled=false;
+  }
+}
+
+function renderAdminEditor(){
+  const w=siteContent.welcome;
+  const a=siteContent.about;
+  document.getElementById('adm-welcome-title').value=w.title;
+  document.getElementById('adm-welcome-p1').value=w.p1;
+  document.getElementById('adm-welcome-p2').value=w.p2;
+  document.getElementById('adm-welcome-footer').value=w.footer;
+  document.getElementById('adm-about-headline').value=a.headline;
+  document.getElementById('adm-about-hero-body').value=a.heroBody;
+  document.getElementById('adm-about-mission').value=a.mission;
+  document.getElementById('adm-about-quote').value=a.quote;
+  document.getElementById('adm-about-beliefs').value=a.beliefs;
+  document.getElementById('adm-about-founders').value=a.founders;
+  document.getElementById('adm-about-footer').value=a.footer;
+  // Pillars
+  const pp=document.getElementById('adm-pillars');pp.innerHTML='';
+  w.pillars.forEach((p,i)=>{
+    const d=document.createElement('div');d.className='adm-pillar-block';
+    d.innerHTML=`<div class="adm-section-mini">Pillar ${i+1}</div>
+      <div class="adm-pillar-row">
+        <input id="adm-pillar-icon-${i}" class="adm-pillar-emoji" value="${p.icon}" />
+        <input id="adm-pillar-title-${i}" class="adm-input" style="flex:1" value="${p.title}" />
+      </div>
+      <textarea id="adm-pillar-desc-${i}" class="adm-textarea" rows="2">${p.desc}</textarea>`;
+    pp.appendChild(d);
+  });
+  // Properties
+  const pr=document.getElementById('adm-properties');pr.innerHTML='';
+  a.properties.forEach((p,i)=>{
+    const d=document.createElement('div');d.className='adm-pillar-block';
+    d.innerHTML=`<div class="adm-section-mini">Property ${i+1}</div>
+      <div class="adm-pillar-row">
+        <input id="adm-prop-icon-${i}" class="adm-pillar-emoji" value="${p.icon}" />
+        <input id="adm-prop-title-${i}" class="adm-input" style="flex:1" value="${p.title}" />
+      </div>
+      <textarea id="adm-prop-desc-${i}" class="adm-textarea" rows="2">${p.desc}</textarea>`;
+    pr.appendChild(d);
+  });
+}
+
+function renderWelcomeOverlay(){
+  const w=siteContent.welcome;
+  const titleLines=w.title.replace(/\\n/g,'\n').split('\n').join('<br>');
+  const pillarsHtml=w.pillars.map(p=>`
+    <div class="welcome-pillar">
+      <div class="welcome-pillar-icon">${p.icon}</div>
+      <div>
+        <div class="welcome-pillar-title">${p.title}</div>
+        <div class="welcome-pillar-desc">${p.desc}</div>
+      </div>
+    </div>`).join('');
+  document.getElementById('welcome-sheet-inner').innerHTML=`
+    <div class="welcome-anchor-bar">
+      <div style="width:36px;height:4px;border-radius:2px;background:var(--border-mid);margin:0 auto 20px"></div>
+      <div style="text-align:center;margin-bottom:4px"><span style="font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#8B7FD4">The Runaway Anchor</span></div>
+      <div style="font-size:22px;font-weight:600;color:var(--text);text-align:center;margin-bottom:12px;line-height:1.3">${titleLines}</div>
+    </div>
+    <p style="font-size:15px;line-height:1.7;color:var(--text-muted);margin-bottom:16px">${w.p1}</p>
+    <p style="font-size:15px;line-height:1.7;color:var(--text-muted);margin-bottom:20px">${w.p2}</p>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">${pillarsHtml}</div>
+    <button class="signin-btn" onclick="dismissWelcome()" style="margin-bottom:8px">Let's go →</button>
+    <p style="font-size:12px;color:var(--text-hint);text-align:center">${w.footer}</p>`;
+}
+
+function renderAboutBrand(){
+  const a=siteContent.about;
+  const propsHtml=a.properties.map(p=>`
+    <div style="display:flex;gap:12px;align-items:flex-start">
+      <span style="font-size:20px;flex-shrink:0">${p.icon}</span>
+      <div>
+        <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px">${p.title}</div>
+        <div style="font-size:13px;color:var(--text-muted);line-height:1.5">${p.desc}</div>
+      </div>
+    </div>`).join('');
+  const el=document.getElementById('about-brand-section');
+  if(!el)return;
+  el.innerHTML=`
+    <div style="border-radius:var(--radius-lg);overflow:hidden;border:0.5px solid var(--border);margin-bottom:16px">
+      <div style="background:#534AB7;padding:20px 18px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:6px">Social Wellness Company</div>
+        <div style="font-size:20px;font-weight:600;color:white;line-height:1.3;margin-bottom:10px">${a.headline}</div>
+        <div style="font-size:14px;color:rgba(255,255,255,0.8);line-height:1.6">${a.heroBody}</div>
+      </div>
+      <div style="background:var(--bg-card);padding:16px 18px">
+        <div style="font-size:13px;color:var(--text-muted);line-height:1.7">${a.mission}</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+      <div style="background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px">
+        <div style="font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8B7FD4;margin-bottom:8px">What we make</div>
+        <div style="display:flex;flex-direction:column;gap:12px">${propsHtml}</div>
+      </div>
+      <div style="background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px">
+        <div style="font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8B7FD4;margin-bottom:8px">What we believe</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:13px;color:var(--text-muted);line-height:1.6;padding:10px 12px;background:var(--bg-surface);border-radius:var(--radius);border-left:3px solid #534AB7">"${a.quote}"</div>
+          <div style="font-size:13px;color:var(--text-muted);line-height:1.6">${a.beliefs}</div>
+        </div>
+      </div>
+      <div style="background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px">
+        <div style="font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8B7FD4;margin-bottom:8px">The five founders</div>
+        <div style="font-size:13px;color:var(--text-muted);line-height:1.6">${a.founders}</div>
+      </div>
+    </div>
+    <div style="text-align:center;padding-bottom:32px">
+      <div style="font-size:12px;color:var(--text-hint);line-height:1.8">${a.footer}</div>
+    </div>`;
+}
+
+
 
 const ADJECTIVES=['amber','bloom','cedar','dusk','ember','frost','golden','haven','indigo','jasper','keen','linden','mellow','noble','opal','pine','quiet','river','sage','tidal','umber','velvet','willow','zephyr'];
 const NOUNS=['anchor','bay','birch','brook','cask','cliff','cove','creek','dale','dew','drift','dune','fern','fjord','grove','gale','harbor','heath','isle','knoll','lark','lea','mead','mist','moon','moss','peak','raft','reef','ridge','run','shore','silt','sky','slab','spring','stone','surf','tide','vale','vine','wake','wave','wren'];
