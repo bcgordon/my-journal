@@ -171,6 +171,11 @@ body{padding-top:var(--safe-top);padding-bottom:var(--safe-bottom)}
 .swatch{width:44px;height:44px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all 0.15s}
 .swatch.selected{border-color:var(--text)}
 .signout-btn{margin-top:32px;width:100%;padding:12px;border-radius:var(--radius-lg);border:0.5px solid var(--border-mid);background:transparent;color:var(--text-muted);font-size:14px;font-family:inherit;cursor:pointer}
+.welcome-sheet{background:var(--bg);border-radius:24px 24px 0 0;padding:20px 24px 40px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+.welcome-pillar{display:flex;align-items:flex-start;gap:14px;padding:12px 14px;background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg)}
+.welcome-pillar-icon{font-size:22px;flex-shrink:0;margin-top:1px}
+.welcome-pillar-title{font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px}
+.welcome-pillar-desc{font-size:13px;color:var(--text-muted);line-height:1.5}
 .wizard-dot{width:8px;height:8px;border-radius:50%;background:var(--border-mid);transition:all 0.2s}
 .wizard-dot.active{background:var(--accent);width:20px;border-radius:4px}
 .wizard-dot.done{background:var(--accent-mid)}
@@ -225,7 +230,52 @@ body{padding-top:var(--safe-top);padding-bottom:var(--safe-bottom)}
     </div>
   </div>
 
-  <!-- MAIN APP -->
+  <!-- WELCOME OVERLAY (shown once on first login) -->
+  <div id="welcome-overlay" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(10,8,5,0.7);align-items:flex-end;justify-content:center">
+    <div class="welcome-sheet">
+      <div class="welcome-anchor-bar">
+        <div style="width:36px;height:4px;border-radius:2px;background:var(--border-mid);margin:0 auto 20px"></div>
+        <div style="text-align:center;margin-bottom:4px">
+          <span style="font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#8B7FD4">The Runaway Anchor</span>
+        </div>
+        <div style="font-size:22px;font-weight:600;color:var(--text);text-align:center;margin-bottom:12px;line-height:1.3">Welcome to<br>The Plan</div>
+      </div>
+      <p style="font-size:15px;line-height:1.7;color:var(--text-muted);margin-bottom:16px">The drink is a doorway. That's the idea at the heart of The Runaway Anchor — that gathering around a table, raising a glass, and asking good questions is one of the most powerful things human beings can do together.</p>
+      <p style="font-size:15px;line-height:1.7;color:var(--text-muted);margin-bottom:20px">The Plan is built on that same belief. It's a daily habit journal designed to help you live more intentionally — not by optimising yourself, but by showing up, paying attention, and making small choices that add up to a life that feels like yours.</p>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
+        <div class="welcome-pillar">
+          <div class="welcome-pillar-icon">🥂</div>
+          <div>
+            <div class="welcome-pillar-title">The Table</div>
+            <div class="welcome-pillar-desc">Cocktails &amp; mocktails — the original Runaway Anchor. Every recipe is an invitation to gather.</div>
+          </div>
+        </div>
+        <div class="welcome-pillar">
+          <div class="welcome-pillar-icon">🌿</div>
+          <div>
+            <div class="welcome-pillar-title">Find Enough</div>
+            <div class="welcome-pillar-desc">An app about recognising contentment. The art of knowing when you have what you need.</div>
+          </div>
+        </div>
+        <div class="welcome-pillar">
+          <div class="welcome-pillar-icon">📓</div>
+          <div>
+            <div class="welcome-pillar-title">The Plan</div>
+            <div class="welcome-pillar-desc">You're here. Daily habits, focus areas, and reflection — built for intentional living.</div>
+          </div>
+        </div>
+        <div class="welcome-pillar">
+          <div class="welcome-pillar-icon">✍️</div>
+          <div>
+            <div class="welcome-pillar-title">Letters from BC Gordon</div>
+            <div class="welcome-pillar-desc">Writing on connection and meaning. Find it on Substack.</div>
+          </div>
+        </div>
+      </div>
+      <button class="signin-btn" onclick="dismissWelcome()" style="margin-bottom:8px">Let's go →</button>
+      <p style="font-size:12px;color:var(--text-hint);text-align:center">From BC Gordon &amp; the five founders of The Runaway Anchor</p>
+    </div>
+  </div>
   <div class="main-app" id="main-app">
     <div class="header">
       <div class="header-appname">the plan</div>
@@ -419,6 +469,71 @@ body{padding-top:var(--safe-top);padding-bottom:var(--safe-bottom)}
           · Clearing your browser data will sign you out, but your entries are safe in the cloud — just sign back in with your code.<br>
           · Dark mode preference is saved per device, not per code.
         </div>
+
+        <div class="section-label">About The Runaway Anchor</div>
+        <div style="border-radius:var(--radius-lg);overflow:hidden;border:0.5px solid var(--border);margin-bottom:16px">
+          <div style="background:#534AB7;padding:20px 18px">
+            <div style="font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:6px">Social Wellness Company</div>
+            <div style="font-size:20px;font-weight:600;color:white;line-height:1.3;margin-bottom:10px">The drink is a doorway.</div>
+            <div style="font-size:14px;color:rgba(255,255,255,0.8);line-height:1.6">The Runaway Anchor started as a place for cocktails and mocktails. It's becoming something larger — a company built around the idea that gathering, connecting, and living well together is one of the most important things we can do.</div>
+          </div>
+          <div style="background:var(--bg-card);padding:16px 18px">
+            <div style="font-size:13px;color:var(--text-muted);line-height:1.7">Founded by BC Gordon and four co-founders, The Runaway Anchor is expanding into a <em>social wellness company</em> — a brand and community dedicated to the art of living intentionally with other people. Not self-optimisation. Not productivity theatre. Just the quiet, consistent practice of showing up for your life and the people in it.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+          <div style="background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px">
+            <div style="font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8B7FD4;margin-bottom:8px">What we make</div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <span style="font-size:20px;flex-shrink:0">🥂</span>
+                <div>
+                  <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px">The Table</div>
+                  <div style="font-size:13px;color:var(--text-muted);line-height:1.5">Our original home — cocktails, mocktails, and the culture of gathering. Every recipe is an invitation to slow down and share something with someone.</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <span style="font-size:20px;flex-shrink:0">🌿</span>
+                <div>
+                  <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px">Find Enough</div>
+                  <div style="font-size:13px;color:var(--text-muted);line-height:1.5">An app about contentment. In a world that always wants more, Find Enough helps you recognise when you already have what you need.</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <span style="font-size:20px;flex-shrink:0">📓</span>
+                <div>
+                  <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px">The Plan</div>
+                  <div style="font-size:13px;color:var(--text-muted);line-height:1.5">The app you're using right now. A daily habit journal for intentional living — check in, track what matters, and reflect on your days.</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <span style="font-size:20px;flex-shrink:0">✍️</span>
+                <div>
+                  <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px">Letters from BC Gordon</div>
+                  <div style="font-size:13px;color:var(--text-muted);line-height:1.5">Writing on connection, meaning, and the texture of everyday life. Published on Substack — equal parts personal essay and open letter.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px">
+            <div style="font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8B7FD4;margin-bottom:8px">What we believe</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="font-size:13px;color:var(--text-muted);line-height:1.6;padding:10px 12px;background:var(--bg-surface);border-radius:var(--radius);border-left:3px solid #534AB7">"Social wellness isn't about being social. It's about the quality of your presence — with yourself, with others, and with the life you're actually living."</div>
+              <div style="font-size:13px;color:var(--text-muted);line-height:1.6">We believe the small rituals matter. The morning check-in. The evening drink with a friend. The question asked across a table that changes how you see something. These aren't distractions from a meaningful life — they <em>are</em> the meaningful life.</div>
+            </div>
+          </div>
+
+          <div style="background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px">
+            <div style="font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8B7FD4;margin-bottom:8px">The five founders</div>
+            <div style="font-size:13px;color:var(--text-muted);line-height:1.6">The Runaway Anchor is a collaboration. Five co-founders, one shared belief that the world needs more spaces — digital and physical — dedicated to genuine human connection. This is early days, and we're building in the open.</div>
+          </div>
+        </div>
+
+        <div style="text-align:center;padding-bottom:32px">
+          <div style="font-size:12px;color:var(--text-hint);line-height:1.8">The Runaway Anchor · Est. 2023<br>Cocktails &amp; Mocktails · Social Wellness · Intentional Living</div>
+        </div>
       </div>
     </div>
 
@@ -472,6 +587,15 @@ async function submitCode(){
 document.getElementById('code-input').addEventListener('keydown',e=>{if(e.key==='Enter')submitCode();});
 function signOut(){if(!confirm('Sign out of this device?'))return;localStorage.removeItem('journal_code');location.reload();}
 
+function showWelcome(){
+  const overlay=document.getElementById('welcome-overlay');
+  overlay.style.display='flex';
+}
+function dismissWelcome(){
+  sl('welcome_seen',true);
+  document.getElementById('welcome-overlay').style.display='none';
+}
+
 async function initApp(code){
   userCode=code;
   document.getElementById('signin-screen').style.display='none';
@@ -484,6 +608,7 @@ async function initApp(code){
   await loadAllEntries();
   loadToday();
   renderTodayUI();
+  if(!gl('welcome_seen')) showWelcome();
 }
 
 async function loadSettings(){
