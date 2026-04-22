@@ -179,11 +179,6 @@ body{padding-top:var(--safe-top);padding-bottom:var(--safe-bottom)}
 .adm-pillar-row{display:flex;gap:8px;align-items:center}
 .adm-pillar-emoji{width:44px;border:0.5px solid var(--border);border-radius:var(--radius);padding:8px;font-size:16px;font-family:inherit;color:var(--text);background:var(--bg-card);outline:none;text-align:center}
 .adm-section-mini{font-size:11px;color:var(--text-hint);margin-bottom:2px}
-.welcome-sheet{background:var(--bg);border-radius:24px 24px 0 0;padding:20px 24px 40px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
-.welcome-pillar{display:flex;align-items:flex-start;gap:14px;padding:12px 14px;background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg)}
-.welcome-pillar-icon{font-size:22px;flex-shrink:0;margin-top:1px}
-.welcome-pillar-title{font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px}
-.welcome-pillar-desc{font-size:13px;color:var(--text-muted);line-height:1.5}
 .wizard-dot{width:8px;height:8px;border-radius:50%;background:var(--border-mid);transition:all 0.2s}
 .wizard-dot.active{background:var(--accent);width:20px;border-radius:4px}
 .wizard-dot.done{background:var(--accent-mid)}
@@ -238,10 +233,6 @@ body{padding-top:var(--safe-top);padding-bottom:var(--safe-bottom)}
     </div>
   </div>
 
-  <!-- WELCOME OVERLAY (shown once on first login) -->
-  <div id="welcome-overlay" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(10,8,5,0.7);align-items:flex-end;justify-content:center">
-    <div class="welcome-sheet" id="welcome-sheet-inner"></div>
-  </div>
   <div class="main-app" id="main-app">
     <div class="header">
       <div class="header-appname">the plan</div>
@@ -437,8 +428,6 @@ body{padding-top:var(--safe-top);padding-bottom:var(--safe-bottom)}
           · Dark mode preference is saved per device, not per code.
         </div>
 
-        <div class="section-label">About The Runaway Anchor</div>
-        <div id="about-brand-section"></div>
       </div>
     </div>
 
@@ -469,42 +458,7 @@ body{padding-top:var(--safe-top);padding-bottom:var(--safe-bottom)}
         </div>
 
         <div style="font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);margin:16px 0 8px">Welcome pillars</div>
-        <div id="adm-pillars" style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px"></div>
-
-        <div class="section-label">About — brand section</div>
-        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px">
-          <div>
-            <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Hero headline</div>
-            <input id="adm-about-headline" class="adm-input" type="text" />
-          </div>
-          <div>
-            <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Hero body</div>
-            <textarea id="adm-about-hero-body" class="adm-textarea" rows="3"></textarea>
-          </div>
-          <div>
-            <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Mission paragraph</div>
-            <textarea id="adm-about-mission" class="adm-textarea" rows="3"></textarea>
-          </div>
-          <div>
-            <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Pull quote</div>
-            <textarea id="adm-about-quote" class="adm-textarea" rows="2"></textarea>
-          </div>
-          <div>
-            <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Beliefs paragraph</div>
-            <textarea id="adm-about-beliefs" class="adm-textarea" rows="3"></textarea>
-          </div>
-          <div>
-            <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Founders paragraph</div>
-            <textarea id="adm-about-founders" class="adm-textarea" rows="3"></textarea>
-          </div>
-          <div>
-            <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Footer tagline</div>
-            <input id="adm-about-footer" class="adm-input" type="text" />
-          </div>
-        </div>
-
-        <div style="font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);margin:16px 0 8px">About — property cards</div>
-        <div id="adm-properties" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px"></div>
+        <div id="adm-pillars" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px"></div>
 
         <div id="adm-save-status" style="font-size:12px;color:var(--text-hint);text-align:center;min-height:18px"></div>
         <button class="cust-save-btn" id="adm-save-btn" onclick="saveContent()">Save &amp; publish</button>
@@ -567,16 +521,6 @@ async function submitCode(){
 document.getElementById('code-input').addEventListener('keydown',e=>{if(e.key==='Enter')submitCode();});
 function signOut(){if(!confirm('Sign out of this device?'))return;localStorage.removeItem('journal_code');location.reload();}
 
-function showWelcome(){
-  renderWelcomeOverlay();
-  const overlay=document.getElementById('welcome-overlay');
-  overlay.style.display='flex';
-}
-function dismissWelcome(){
-  sl('welcome_seen',true);
-  document.getElementById('welcome-overlay').style.display='none';
-}
-
 async function initApp(code){
   userCode=code;
   document.getElementById('signin-screen').style.display='none';
@@ -590,9 +534,7 @@ async function initApp(code){
   await loadAllEntries();
   loadToday();
   renderTodayUI();
-  renderAboutBrand();
   if(code===ADMIN_CODE){const tab=document.getElementById('tab-admin');if(tab)tab.style.display='';}
-  if(!gl('welcome_seen')) showWelcome();
 }
 
 async function loadSettings(){
@@ -947,24 +889,13 @@ async function saveContent(){
   c.welcome.p1=document.getElementById('adm-welcome-p1').value;
   c.welcome.p2=document.getElementById('adm-welcome-p2').value;
   c.welcome.footer=document.getElementById('adm-welcome-footer').value;
-  c.about.headline=document.getElementById('adm-about-headline').value;
-  c.about.heroBody=document.getElementById('adm-about-hero-body').value;
-  c.about.mission=document.getElementById('adm-about-mission').value;
-  c.about.quote=document.getElementById('adm-about-quote').value;
-  c.about.beliefs=document.getElementById('adm-about-beliefs').value;
-  c.about.founders=document.getElementById('adm-about-founders').value;
-  c.about.footer=document.getElementById('adm-about-footer').value;
+  c.about.headline=document.getElementById('adm-about-headline')?.value||c.about.headline;
+  // Properties kept as-is since fields removed
   // Pillars
   c.welcome.pillars=c.welcome.pillars.map((_,i)=>({
     icon:document.getElementById('adm-pillar-icon-'+i).value,
     title:document.getElementById('adm-pillar-title-'+i).value,
     desc:document.getElementById('adm-pillar-desc-'+i).value
-  }));
-  // Properties
-  c.about.properties=c.about.properties.map((_,i)=>({
-    icon:document.getElementById('adm-prop-icon-'+i).value,
-    title:document.getElementById('adm-prop-title-'+i).value,
-    desc:document.getElementById('adm-prop-desc-'+i).value
   }));
   const btn=document.getElementById('adm-save-btn');
   const status=document.getElementById('adm-save-status');
@@ -977,7 +908,6 @@ async function saveContent(){
       await sbFetch('site_content',{method:'POST',prefer:'return=minimal',body:JSON.stringify({id:1,data:c})});
     }
     siteContent=c;
-    renderAboutBrand();
     status.textContent='Published ✓';status.style.color='var(--accent)';
     setTimeout(()=>{status.textContent='';btn.textContent='Save & publish';btn.disabled=false;},2500);
   }catch(e){
@@ -1012,90 +942,7 @@ function renderAdminEditor(){
       <textarea id="adm-pillar-desc-${i}" class="adm-textarea" rows="2">${p.desc}</textarea>`;
     pp.appendChild(d);
   });
-  // Properties
-  const pr=document.getElementById('adm-properties');pr.innerHTML='';
-  a.properties.forEach((p,i)=>{
-    const d=document.createElement('div');d.className='adm-pillar-block';
-    d.innerHTML=`<div class="adm-section-mini">Property ${i+1}</div>
-      <div class="adm-pillar-row">
-        <input id="adm-prop-icon-${i}" class="adm-pillar-emoji" value="${p.icon}" />
-        <input id="adm-prop-title-${i}" class="adm-input" style="flex:1" value="${p.title}" />
-      </div>
-      <textarea id="adm-prop-desc-${i}" class="adm-textarea" rows="2">${p.desc}</textarea>`;
-    pr.appendChild(d);
-  });
 }
-
-function renderWelcomeOverlay(){
-  const w=siteContent.welcome;
-  const titleLines=w.title.replace(/\\n/g,'\n').split('\n').join('<br>');
-  const pillarsHtml=w.pillars.map(p=>`
-    <div class="welcome-pillar">
-      <div class="welcome-pillar-icon">${p.icon}</div>
-      <div>
-        <div class="welcome-pillar-title">${p.title}</div>
-        <div class="welcome-pillar-desc">${p.desc}</div>
-      </div>
-    </div>`).join('');
-  document.getElementById('welcome-sheet-inner').innerHTML=`
-    <div class="welcome-anchor-bar">
-      <div style="width:36px;height:4px;border-radius:2px;background:var(--border-mid);margin:0 auto 20px"></div>
-      <div style="text-align:center;margin-bottom:4px"><span style="font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#8B7FD4">The Runaway Anchor</span></div>
-      <div style="font-size:22px;font-weight:600;color:var(--text);text-align:center;margin-bottom:12px;line-height:1.3">${titleLines}</div>
-    </div>
-    <p style="font-size:15px;line-height:1.7;color:var(--text-muted);margin-bottom:16px">${w.p1}</p>
-    <p style="font-size:15px;line-height:1.7;color:var(--text-muted);margin-bottom:20px">${w.p2}</p>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">${pillarsHtml}</div>
-    <button class="signin-btn" onclick="dismissWelcome()" style="margin-bottom:8px">Let's go →</button>
-    <p style="font-size:12px;color:var(--text-hint);text-align:center">${w.footer}</p>`;
-}
-
-function renderAboutBrand(){
-  const a=siteContent.about;
-  const propsHtml=a.properties.map(p=>`
-    <div style="display:flex;gap:12px;align-items:flex-start">
-      <span style="font-size:20px;flex-shrink:0">${p.icon}</span>
-      <div>
-        <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px">${p.title}</div>
-        <div style="font-size:13px;color:var(--text-muted);line-height:1.5">${p.desc}</div>
-      </div>
-    </div>`).join('');
-  const el=document.getElementById('about-brand-section');
-  if(!el)return;
-  el.innerHTML=`
-    <div style="border-radius:var(--radius-lg);overflow:hidden;border:0.5px solid var(--border);margin-bottom:16px">
-      <div style="background:#534AB7;padding:20px 18px">
-        <div style="font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:6px">Social Wellness Company</div>
-        <div style="font-size:20px;font-weight:600;color:white;line-height:1.3;margin-bottom:10px">${a.headline}</div>
-        <div style="font-size:14px;color:rgba(255,255,255,0.8);line-height:1.6">${a.heroBody}</div>
-      </div>
-      <div style="background:var(--bg-card);padding:16px 18px">
-        <div style="font-size:13px;color:var(--text-muted);line-height:1.7">${a.mission}</div>
-      </div>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
-      <div style="background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px">
-        <div style="font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8B7FD4;margin-bottom:8px">What we make</div>
-        <div style="display:flex;flex-direction:column;gap:12px">${propsHtml}</div>
-      </div>
-      <div style="background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px">
-        <div style="font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8B7FD4;margin-bottom:8px">What we believe</div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <div style="font-size:13px;color:var(--text-muted);line-height:1.6;padding:10px 12px;background:var(--bg-surface);border-radius:var(--radius);border-left:3px solid #534AB7">"${a.quote}"</div>
-          <div style="font-size:13px;color:var(--text-muted);line-height:1.6">${a.beliefs}</div>
-        </div>
-      </div>
-      <div style="background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px">
-        <div style="font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8B7FD4;margin-bottom:8px">The five founders</div>
-        <div style="font-size:13px;color:var(--text-muted);line-height:1.6">${a.founders}</div>
-      </div>
-    </div>
-    <div style="text-align:center;padding-bottom:32px">
-      <div style="font-size:12px;color:var(--text-hint);line-height:1.8">${a.footer}</div>
-    </div>`;
-}
-
-
 
 const ADJECTIVES=['amber','bloom','cedar','dusk','ember','frost','golden','haven','indigo','jasper','keen','linden','mellow','noble','opal','pine','quiet','river','sage','tidal','umber','velvet','willow','zephyr'];
 const NOUNS=['anchor','bay','birch','brook','cask','cliff','cove','creek','dale','dew','drift','dune','fern','fjord','grove','gale','harbor','heath','isle','knoll','lark','lea','mead','mist','moon','moss','peak','raft','reef','ridge','run','shore','silt','sky','slab','spring','stone','surf','tide','vale','vine','wake','wave','wren'];
