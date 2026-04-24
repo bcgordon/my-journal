@@ -109,7 +109,7 @@ body{padding-top:var(--safe-top);padding-bottom:var(--safe-bottom)}
 .big-frog-input::placeholder{color:var(--text-hint)}
 .freewrite{width:100%;border:0.5px solid var(--border);border-radius:var(--radius);padding:12px;font-size:14px;font-family:inherit;color:var(--text);background:var(--bg-card);outline:none;resize:none;line-height:1.6;min-height:100px}
 .freewrite:focus{border-color:var(--accent)}
-.save-wrap{padding:10px 16px 12px;border-top:0.5px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.save-wrap{padding:10px 16px 12px;border-top:0.5px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;bottom:calc(var(--safe-bottom) + 56px);z-index:50}
 .save-btn{padding:10px 20px;border-radius:var(--radius-lg);border:none;background:var(--accent);color:white;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:all 0.15s;flex-shrink:0}
 .save-btn:active{transform:scale(0.97);opacity:0.9}
 .save-btn:disabled{opacity:0.5}
@@ -798,7 +798,10 @@ async function saveEntry(manual=false){
     else{setTimeout(()=>setAutoSaveStatus('idle'),3000);}
   }catch(e){
     console.error('saveEntry failed:',e);
-    setAutoSaveStatus('error');
+    const label=document.getElementById('autosave-label');
+    if(label)label.textContent='Error: '+e.message.slice(0,60);
+    const dot=document.getElementById('autosave-dot');
+    if(dot){dot.style.background='#D85A30';}
     if(manual){btn.textContent='Save now';btn.disabled=false;}
   }
 }
