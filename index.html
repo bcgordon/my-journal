@@ -864,25 +864,45 @@ function renderStats(){
 
 function renderCustomize(){
   if(!custSettings) custSettings=JSON.parse(JSON.stringify(settings));
+  // Checklist
   const cl=document.getElementById('cust-checklist');cl.innerHTML='';
-  custSettings.checklist.forEach((label,i)=>{const row=document.createElement('div');row.className='cust-item';row.innerHTML='<input type="text" value="'+label+'" /><button class="del-btn" onclick="custDelCheck('+i+')">&#215;</button>';row.querySelector('input').addEventListener('input',e=>{custSettings.checklist[i]=e.target.value;});cl.appendChild(row);});
+  custSettings.checklist.forEach((label,i)=>{
+    const row=document.createElement('div');row.className='cust-item';row.draggable=true;
+    row.innerHTML='<span class="cust-drag">⠿</span><input type="text" value="'+label.replace(/"/g,'&quot;')+'" /><button class="del-btn" onclick="custDelCheck('+i+')">&#215;</button>';
+    row.querySelector('input').addEventListener('input',e=>{custSettings.checklist[i]=e.target.value;});
+    row.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain','check:'+i);row.classList.add('cust-dragging');});
+    row.addEventListener('dragend',()=>row.classList.remove('cust-dragging'));
+    row.addEventListener('dragover',e=>{e.preventDefault();row.classList.add('cust-drag-over');});
+    row.addEventListener('dragleave',()=>row.classList.remove('cust-drag-over'));
+    row.addEventListener('drop',e=>{e.preventDefault();row.classList.remove('cust-drag-over');const from=parseInt(e.dataTransfer.getData('text/plain').split(':')[1]);const to=i;if(from===to)return;const item=custSettings.checklist.splice(from,1)[0];custSettings.checklist.splice(to,0,item);renderCustomize();});
+    cl.appendChild(row);
+  });
+  // Focus areas
   const fa=document.getElementById('cust-focus-areas');fa.innerHTML='';
   custSettings.focusAreas.forEach((area,i)=>renderCustFocusBlock(area,i));
 }
 function renderCustFocusBlock(area,i){
   const fa=document.getElementById('cust-focus-areas');
-  const block=document.createElement('div');block.className='focus-area-block';block.id='cust-fa-'+i;
+  const block=document.createElement('div');block.className='focus-area-block';block.id='cust-fa-'+i;block.draggable=true;
   const typeOptions=['log','tags','checks','tasks'].map(t=>'<option value="'+t+'"'+(area.type===t?' selected':'')+'>'+t+'</option>').join('');
   let itemsHtml='';
-  if(area.type==='tags'||area.type==='checks'){itemsHtml='<div class="cust-list" id="cust-fa-items-'+i+'">'+(area.items||[]).map((item,j)=>'<div class="cust-item"><input type="text" value="'+item+'" oninput="custSettings.focusAreas['+i+'].items['+j+']=this.value" /><button class="del-btn" onclick="custDelFocusItem('+i+','+j+')">&#215;</button></div>').join('')+'</div><div class="cust-add-row"><input id="cust-fa-item-input-'+i+'" type="text" placeholder="Add item..." /><button class="add-btn" onclick="custAddFocusItem('+i+')">+</button></div>';}
-  block.innerHTML='<div class="focus-area-header"><input type="text" value="'+area.name+'" oninput="custSettings.focusAreas['+i+'].name=this.value" /><select class="focus-type-select" oninput="custSettings.focusAreas['+i+'].type=this.value;renderCustomize()">'+typeOptions+'</select><button class="del-btn" onclick="custDelFocus('+i+')">&#215;</button></div>'+itemsHtml;
+  if(area.type==='tags'||area.type==='checks'){
+    itemsHtml='<div class="cust-list" id="cust-fa-items-'+i+'">'+(area.items||[]).map((item,j)=>'<div class="cust-item"><input type="text" value="'+item.replace(/"/g,'&quot;')+'" oninput="custSettings.focusAreas['+i+'].items['+j+']=this.value" /><button class="del-btn" onclick="custDelFocusItem('+i+','+j+')">&#215;</button></div>').join('')+'</div><div class="cust-add-row"><input id="cust-fa-item-input-'+i+'" type="text" placeholder="Add item..." /><button class="add-btn" onclick="custAddFocusItem('+i+')">+</button></div>';
+  }
+  block.innerHTML='<div class="focus-area-header"><span class="cust-drag" style="font-size:16px;cursor:grab;color:var(--text-hint);flex-shrink:0">⠿</span><input type="text" value="'+area.name.replace(/"/g,'&quot;')+'" oninput="custSettings.focusAreas['+i+'].name=this.value" /><select class="focus-type-select" onchange="custSettings.focusAreas['+i+'].type=this.value;renderCustomize()">'+typeOptions+'</select><button class="del-btn" onclick="custDelFocus('+i+')">&#215;</button></div>'+itemsHtml;
+  // Drag to reorder focus areas
+  block.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain','focus:'+i);block.classList.add('cust-dragging');});
+  block.addEventListener('dragend',()=>block.classList.remove('cust-dragging'));
+  block.addEventListener('dragover',e=>{e.preventDefault();block.classList.add('cust-drag-over');});
+  block.addEventListener('dragleave',()=>block.classList.remove('cust-drag-over'));
+  block.addEventListener('drop',e=>{e.preventDefault();block.classList.remove('cust-drag-over');const parts=e.dataTransfer.getData('text/plain').split(':');if(parts[0]!=='focus')return;const from=parseInt(parts[1]);const to=i;if(from===to)return;const item=custSettings.focusAreas.splice(from,1)[0];custSettings.focusAreas.splice(to,0,item);renderCustomize();});
   fa.appendChild(block);
 }
 function custAddCheck(){const inp=document.getElementById('cust-check-input');const v=inp.value.trim();if(!v)return;custSettings.checklist.push(v);inp.value='';renderCustomize();}
 function custDelCheck(i){custSettings.checklist.splice(i,1);renderCustomize();}
-function custAddFocus(){const inp=document.getElementById('cust-focus-input');const v=inp.value.trim();if(!v)return;custSettings.focusAreas.push({name:v,type:'tasks'});inp.value='';renderCustomize();}
-function custDelFocus(i){custSettings.focusAreas.splice(i,1);renderCustomize();}
-function custAddFocusItem(i){const inp=document.getElementById('cust-fa-item-input-'+i);const v=inp.value.trim();if(!v)return;if(!custSettings.focusAreas[i].items)custSettings.focusAreas[i].items=[];custSettings.focusAreas[i].items.push(v);renderCustomize();}
+function custAddFocus(){const inp=document.getElementById('cust-focus-input');const v=inp.value.trim();if(!v)return;if(!custSettings.focusAreas)custSettings.focusAreas=[];custSettings.focusAreas.push({name:v,type:'tasks',items:[]});inp.value='';renderCustomize();}
+function custDelFocus(i){if(!confirm('Remove this focus area?'))return;custSettings.focusAreas.splice(i,1);renderCustomize();}
+function custAddFocusItem(i){const inp=document.getElementById('cust-fa-item-input-'+i);const v=inp.value.trim();if(!v)return;if(!custSettings.focusAreas[i].items)custSettings.focusAreas[i].items=[];custSettings.focusAreas[i].items.push(v);inp.value='';renderCustomize();}
 function custDelFocusItem(i,j){custSettings.focusAreas[i].items.splice(j,1);renderCustomize();}
 document.getElementById('cust-check-input').addEventListener('keydown',e=>{if(e.key==='Enter')custAddCheck();});
 document.getElementById('cust-focus-input').addEventListener('keydown',e=>{if(e.key==='Enter')custAddFocus();});
